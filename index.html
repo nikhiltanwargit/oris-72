@@ -1,149 +1,220 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>AETHER // Cognitive Interface</title>
+<title>AETHER // Library of Babel</title>
 <style>
-*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#020508;color:#d9fbff;font-family:Inter,Segoe UI,system-ui,sans-serif}
-body{overflow-x:hidden}button,input{font:inherit}
-:root{--cyan:#69f4ff;--ice:#d8ffff;--blue:#4d9cff;--green:#65ffc0;--amber:#ffd166;--muted:#66838d;--line:rgba(105,244,255,.18);--panel:rgba(4,13,18,.68)}
-#stars{position:fixed;inset:0;width:100%;height:100%;z-index:-2}
-body:after{content:"";position:fixed;inset:0;pointer-events:none;z-index:10;background:linear-gradient(rgba(105,244,255,.018) 1px,transparent 1px);background-size:100% 4px;mix-blend-mode:screen}
-.shell{min-height:100vh;padding:18px 24px 22px;position:relative}
-.top{height:62px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
-.identity{display:flex;align-items:center;gap:13px}.glyph{width:42px;height:42px;border:1px solid var(--cyan);transform:skew(-12deg);display:grid;place-items:center;box-shadow:0 0 26px rgba(105,244,255,.16)}
-.glyph span{transform:skew(12deg);font-weight:900;color:var(--cyan);letter-spacing:-.1em}.name{font-size:14px;font-weight:900;letter-spacing:.3em}.desc{font:8px ui-monospace,monospace;color:var(--muted);letter-spacing:.2em;margin-top:5px}
-.link{font:9px ui-monospace,monospace;color:var(--green);letter-spacing:.16em;display:flex;align-items:center;gap:8px}.link i{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 13px var(--green);animation:pulse 1.5s infinite}
-@keyframes pulse{50%{opacity:.35;transform:scale(.65)}}
-.dashboard{max-width:1500px;margin:18px auto 0;display:grid;grid-template-columns:250px minmax(420px,1fr) 250px;gap:14px}
-.col{display:flex;flex-direction:column;gap:14px;min-width:0}.panel{border:1px solid var(--line);background:linear-gradient(145deg,rgba(8,22,29,.78),rgba(2,8,12,.68));position:relative;overflow:hidden}.panel:before{content:"";position:absolute;inset:0;background:linear-gradient(120deg,rgba(105,244,255,.035),transparent 25%,transparent 75%,rgba(77,156,255,.025));pointer-events:none}
-.head{height:38px;border-bottom:1px solid var(--line);padding:0 12px;display:flex;align-items:center;justify-content:space-between;font:8px ui-monospace,monospace;letter-spacing:.17em;color:#91b8c2}.tag{font-size:7px;color:var(--cyan);border:1px solid var(--line);padding:4px 6px}
-.core{height:550px;position:relative;background:radial-gradient(circle at 50% 49%,rgba(54,211,255,.12),transparent 27%),radial-gradient(circle at 50% 50%,rgba(30,116,180,.08),transparent 55%)}
-.core canvas{position:absolute;inset:0;width:100%;height:100%}.core-title{position:absolute;top:52px;left:0;right:0;text-align:center;font:8px ui-monospace,monospace;color:#80aeb8;letter-spacing:.28em}
-.core-state{position:absolute;top:73px;left:0;right:0;text-align:center;font-size:10px;color:var(--cyan);letter-spacing:.18em}
-.holo{position:absolute;left:50%;top:50%;width:310px;height:210px;transform:translate(-50%,-50%);filter:drop-shadow(0 0 25px rgba(105,244,255,.18))}
-.ring{position:absolute;border:1px solid rgba(105,244,255,.45);border-radius:50%;left:50%;top:50%;transform:translate(-50%,-50%) rotateX(62deg)}
-.r1{width:300px;height:116px;animation:spin 10s linear infinite}.r2{width:235px;height:91px;animation:spin 7s linear infinite reverse}.r3{width:170px;height:66px;animation:spin 5s linear infinite}.r4{width:116px;height:45px;border-color:rgba(216,255,255,.75);box-shadow:0 0 25px rgba(105,244,255,.4);animation:spin 3s linear infinite}
-@keyframes spin{to{transform:translate(-50%,-50%) rotateX(62deg) rotateZ(360deg)}}
-.core-shape{position:absolute;left:50%;top:50%;width:120px;height:120px;transform:translate(-50%,-50%) rotate(45deg);border:1px solid rgba(216,255,255,.7);background:linear-gradient(135deg,rgba(105,244,255,.08),rgba(77,156,255,.02));box-shadow:inset 0 0 35px rgba(105,244,255,.08),0 0 40px rgba(105,244,255,.12);animation:float 4s ease-in-out infinite}
-.core-shape:after{content:"";position:absolute;inset:19px;border:1px solid rgba(105,244,255,.6);box-shadow:0 0 22px rgba(105,244,255,.25)}
-@keyframes float{50%{transform:translate(-50%,-50%) rotate(225deg) scale(1.04)}}
-.axis{position:absolute;left:50%;top:50%;width:390px;height:1px;background:linear-gradient(90deg,transparent,rgba(105,244,255,.5),transparent);transform:translate(-50%,-50%) rotate(-16deg)}.axis:after{content:"";position:absolute;right:18%;top:-2px;width:5px;height:5px;border:1px solid var(--cyan);border-radius:50%;box-shadow:0 0 12px var(--cyan)}
-.read{position:absolute;font:8px ui-monospace,monospace;color:#6f9ca7;letter-spacing:.08em}.read b{display:block;color:var(--cyan);font-size:10px;margin-top:4px}.a{left:18px;top:110px}.b{right:18px;top:145px;text-align:right}.c{left:18px;bottom:92px}.d{right:18px;bottom:88px;text-align:right}
-.command{height:128px}.cmdrow{display:flex;gap:8px;padding:13px}.cmdrow input{flex:1;min-width:0;background:rgba(0,0,0,.28);border:1px solid var(--line);color:var(--ice);padding:11px 12px;outline:none;font:10px ui-monospace,monospace}.cmdrow input:focus{border-color:var(--cyan);box-shadow:0 0 16px rgba(105,244,255,.08)}.btn{border:1px solid var(--cyan);background:rgba(105,244,255,.06);color:var(--cyan);padding:0 13px;cursor:pointer;font:8px ui-monospace,monospace;letter-spacing:.12em}.btn:hover{background:rgba(105,244,255,.13)}.hint{padding:0 13px;color:#567680;font:8px ui-monospace,monospace}
-.metricgrid{display:grid;grid-template-columns:1fr 1fr}.metric{padding:14px;border-bottom:1px solid rgba(105,244,255,.08);border-right:1px solid rgba(105,244,255,.08)}.metric label{display:block;color:#63838d;font:7px ui-monospace,monospace;letter-spacing:.15em}.metric strong{display:block;font:18px ui-monospace,monospace;color:#d9fbff;margin-top:6px}.bar{height:2px;background:#10262d;margin-top:10px}.bar i{display:block;height:100%;background:var(--cyan);box-shadow:0 0 9px var(--cyan)}
-.rows{padding:5px 12px}.row{display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid rgba(105,244,255,.07);font:8px ui-monospace,monospace}.good{color:var(--green)}.amber{color:var(--amber)}
-.log{height:172px;overflow:hidden;padding:5px 12px}.line{padding:7px 0;border-bottom:1px solid rgba(105,244,255,.06);font:8px ui-monospace,monospace;color:#87aab4}.line span{color:#4e7480;margin-right:9px}
-.bottom{max-width:1500px;margin:14px auto 0;display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:14px}.mini{height:190px}.bars{height:125px;padding:15px;display:flex;align-items:flex-end;gap:5px}.bars i{display:block;flex:1;background:linear-gradient(to top,rgba(105,244,255,.55),rgba(105,244,255,.03));border-top:1px solid var(--cyan);min-height:8px;animation:bar 1.4s ease-in-out infinite alternate}.bars i:nth-child(2n){animation-delay:.2s}.bars i:nth-child(3n){animation-delay:.5s}@keyframes bar{to{transform:scaleY(.42)}}.radar{height:138px;position:relative;display:grid;place-items:center}.radar:before,.radar:after{content:"";position:absolute;border:1px solid rgba(105,244,255,.15);border-radius:50%}.radar:before{width:92px;height:92px}.radar:after{width:142px;height:142px}.sweep{width:150px;height:1px;background:linear-gradient(90deg,transparent,var(--cyan));transform-origin:left;animation:sweep 3s linear infinite}.blip{position:absolute;width:5px;height:5px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan)}.p1{left:58%;top:35%}.p2{left:38%;top:58%}.p3{left:65%;top:65%}@keyframes sweep{to{transform:rotate(360deg)}}
-.footer{text-align:center;margin-top:14px;color:#3e6069;font:7px ui-monospace,monospace;letter-spacing:.2em}
-@media(max-width:1050px){.dashboard{grid-template-columns:1fr}.col.left,.col.right{display:grid;grid-template-columns:1fr 1fr}.core{height:500px}.bottom{grid-template-columns:1fr}}@media(max-width:650px){.shell{padding:12px}.top{height:56px}.link{display:none}.col.left,.col.right{display:flex}.core{height:430px}.holo{transform:translate(-50%,-50%) scale(.75)}.axis{width:300px}.bottom{display:flex;flex-direction:column}}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#020508;color:#d9fbff;font-family:Inter,Segoe UI,system-ui,sans-serif}
+body:after{content:"";position:fixed;inset:0;pointer-events:none;z-index:20;background:linear-gradient(rgba(105,244,255,.018) 1px,transparent 1px);background-size:100% 4px}
+#world{position:fixed;inset:0;width:100%;height:100%}
+#hud{position:fixed;inset:0;pointer-events:none;z-index:10}
+.panel{background:rgba(2,10,15,.72);border:1px solid rgba(105,244,255,.22);box-shadow:0 0 30px rgba(0,180,255,.05);backdrop-filter:blur(8px)}
+.top{position:absolute;left:18px;right:18px;top:16px;height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 16px}
+.brand{font-weight:900;letter-spacing:.32em;font-size:13px}.sub{font:8px ui-monospace,monospace;color:#66838d;letter-spacing:.15em;margin-top:4px}
+.status{font:8px ui-monospace,monospace;color:#65ffc0;letter-spacing:.15em}.dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#65ffc0;box-shadow:0 0 12px #65ffc0;margin-right:7px}
+.left{position:absolute;left:18px;bottom:18px;width:260px;padding:14px}.label{font:8px ui-monospace,monospace;color:#66838d;letter-spacing:.18em}.value{font:13px ui-monospace,monospace;color:#69f4ff;margin-top:6px}.row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(105,244,255,.08);font:8px ui-monospace,monospace}.good{color:#65ffc0}
+.cross{position:absolute;left:50%;top:50%;width:20px;height:20px;transform:translate(-50%,-50%);opacity:.75}.cross:before,.cross:after{content:"";position:absolute;background:#69f4ff;box-shadow:0 0 8px #69f4ff}.cross:before{width:20px;height:1px;top:9px}.cross:after{width:1px;height:20px;left:9px}
+.bottom{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);font:8px ui-monospace,monospace;color:#7eaab4;letter-spacing:.14em;text-align:center;text-shadow:0 0 8px #000}
+#boot{position:fixed;inset:0;z-index:30;background:radial-gradient(circle at center,rgba(15,56,70,.25),#020508 65%);display:grid;place-items:center}
+.bootbox{width:min(560px,calc(100vw - 36px));padding:28px;text-align:center}.bootbox h1{margin:0;color:#d9fbff;letter-spacing:.28em;font-size:22px}.bootbox p{color:#66838d;font:9px/1.8 ui-monospace,monospace;letter-spacing:.08em}
+.btn{border:1px solid #69f4ff;background:rgba(105,244,255,.06);color:#69f4ff;padding:12px 18px;cursor:pointer;font:9px ui-monospace,monospace;letter-spacing:.16em}.btn:hover{background:rgba(105,244,255,.14);box-shadow:0 0 20px rgba(105,244,255,.12)}
+#file{display:none}
+#command{position:absolute;right:18px;bottom:18px;width:310px;display:none;padding:10px;pointer-events:auto}.cmdline{display:flex;gap:6px}.cmdline input{flex:1;min-width:0;background:#02080c;border:1px solid rgba(105,244,255,.18);color:#d9fbff;padding:9px;outline:none;font:9px ui-monospace,monospace}.cmdline button{border:1px solid #69f4ff;background:transparent;color:#69f4ff;padding:0 10px;font:8px ui-monospace,monospace}.hint{font:7px ui-monospace,monospace;color:#52727b;margin-top:7px}
 </style>
 </head>
 <body>
-<canvas id="stars"></canvas>
-<div class="shell">
-<header class="top">
-  <div class="identity"><div class="glyph"><span>AI</span></div><div><div class="name">AETHER</div><div class="desc">ADAPTIVE INTELLIGENCE // HOLOGRAPHIC OPERATING ENVIRONMENT</div></div></div>
-  <div class="link"><i></i> COGNITIVE CORE ONLINE <span style="color:#45656e">/</span> LATENCY 11ms</div>
-</header>
+<canvas id="world"></canvas>
 
-<div class="dashboard">
-  <div class="col left">
-    <section class="panel"><div class="head"><span>CORE DIAGNOSTICS</span><span class="tag">LIVE</span></div><div class="metricgrid">
-      <div class="metric"><label>PROCESSING</label><strong id="cpu">87%</strong><div class="bar"><i id="cpub" style="width:87%"></i></div></div>
-      <div class="metric"><label>MEMORY</label><strong id="mem">64%</strong><div class="bar"><i id="memb" style="width:64%"></i></div></div>
-      <div class="metric"><label>NEURAL LOAD</label><strong id="neural">42.8</strong><div class="bar"><i id="neuralb" style="width:71%"></i></div></div>
-      <div class="metric"><label>UPTIME</label><strong id="uptime">18:42:07</strong><div class="bar"><i style="width:100%"></i></div></div>
-    </div></section>
-    <section class="panel"><div class="head"><span>CONNECTED SYSTEMS</span><span class="tag">12/12</span></div><div class="rows">
-      <div class="row"><span>VISION MATRIX</span><b class="good">● ONLINE</b></div><div class="row"><span>KNOWLEDGE GRAPH</span><b class="good">● SYNCED</b></div><div class="row"><span>SIMULATION ENGINE</span><b class="good">● READY</b></div><div class="row"><span>CREATIVE ENGINE</span><b class="good">● ONLINE</b></div><div class="row"><span>VOICE INTERFACE</span><b class="good" id="voiceState">● READY</b></div>
-    </div></section>
-  </div>
-
-  <div class="col center">
-    <section class="panel core">
-      <div class="core-title">AETHER COGNITIVE VISUALIZER // NODE 01</div>
-      <div class="core-state" id="coreState">ANALYZING SYSTEM STATE</div>
-      <div class="holo"><div class="ring r1"></div><div class="ring r2"></div><div class="ring r3"></div><div class="ring r4"></div><div class="core-shape"></div></div>
-      <div class="axis"></div>
-      <div class="read a">COHERENCE<b id="coherence">99.982%</b></div><div class="read b">THROUGHPUT<b id="throughput">4.82 TB/s</b></div><div class="read c">ENTROPY<b id="entropy">0.0041</b></div><div class="read d">MODE<b id="mode">AWARE</b></div>
-    </section>
-    <section class="panel command">
-      <div class="head"><span>COMMAND INTERFACE</span><span class="tag">NATURAL LANGUAGE</span></div>
-      <div class="cmdrow"><input id="command" autocomplete="off" placeholder="Ask AETHER anything…  e.g.  run diagnostics"><button class="btn" id="send" type="button">EXECUTE</button><button class="btn" id="voice" type="button">VOICE</button></div>
-      <div class="hint" id="response">AETHER // Awaiting operator intent.</div>
-    </section>
-  </div>
-
-  <div class="col right">
-    <section class="panel"><div class="head"><span>ACTIVE CONTEXT</span><span class="tag">5 ITEMS</span></div><div class="rows">
-      <div class="row"><span>PRIMARY OBJECTIVE</span><b style="color:var(--cyan)">BUILD</b></div><div class="row"><span>FOCUS</span><b style="color:var(--cyan)">CREATIVE</b></div><div class="row"><span>SESSION</span><b>09:24:16</b></div><div class="row"><span>CONFIDENCE</span><b class="good">98.7%</b></div><div class="row"><span>ETHICAL GUARD</span><b class="good">ACTIVE</b></div>
-    </div></section>
-    <section class="panel"><div class="head"><span>ACTIVITY STREAM</span><span class="tag">AUTO</span></div><div class="log" id="log"></div></section>
-    <section class="panel"><div class="head"><span>QUICK ACTIONS</span><span class="tag">LOCAL</span></div><div class="rows">
-      <div class="row"><button class="btn action" data-action="diagnostics" style="width:100%;padding:8px">RUN FULL DIAGNOSTICS</button></div>
-      <div class="row"><button class="btn action" data-action="scan" style="width:100%;padding:8px">DEEP SYSTEM SCAN</button></div>
-      <div class="row"><button class="btn action" data-action="simulate" style="width:100%;padding:8px">START HOLOGRAM SIM</button></div>
-    </div></section>
+<div id="boot">
+  <div class="bootbox panel">
+    <h1>AETHER // BABEL</h1>
+    <p>THREE-DIMENSIONAL LIBRARY SIMULATION<br>LOAD YOUR BLENDER WORLD TO INITIALIZE THE ENVIRONMENT.</p>
+    <input id="file" type="file" accept=".glb,.gltf">
+    <button class="btn" id="load">LOAD BLENDER WORLD</button>
+    <p id="bootmsg">LOCAL FILES STAY IN YOUR BROWSER.</p>
   </div>
 </div>
 
-<div class="bottom">
-  <section class="panel mini"><div class="head"><span>COGNITIVE ACTIVITY</span><span class="tag">STREAM</span></div><div class="bars" id="bars"></div></section>
-  <section class="panel mini"><div class="head"><span>SENSOR FIELD</span><span class="tag">3D MAP</span></div><div class="radar"><div class="sweep"></div><i class="blip p1"></i><i class="blip p2"></i><i class="blip p3"></i></div></section>
-  <section class="panel mini"><div class="head"><span>MISSION NOTE</span><span class="tag">AETHER</span></div><div style="padding:18px;font:11px/1.8 ui-monospace,monospace;color:#86aab3">“I don't predict the future.<br><span style="color:var(--cyan)">I model the possibilities.</span>”<br><br><span style="color:#45656e">— COGNITIVE CORE / READY</span></div></section>
-</div>
-<div class="footer">AETHER // FICTIONAL SCI-FI AI INTERFACE // SIMULATION ENVIRONMENT // NO REAL-WORLD SYSTEM CONTROL</div>
+<div id="hud">
+  <div class="top panel">
+    <div><div class="brand">AETHER</div><div class="sub">COGNITIVE EXPLORATION ENVIRONMENT // BABEL-01</div></div>
+    <div class="status"><span class="dot"></span><span id="state">WORLD STANDBY</span></div>
+  </div>
+  <div class="cross"></div>
+  <div class="left panel">
+    <div class="label">EXPLORATION TELEMETRY</div>
+    <div class="row"><span>POSITION</span><span id="pos">0 / 0 / 0</span></div>
+    <div class="row"><span>FPS</span><span id="fps" class="good">--</span></div>
+    <div class="row"><span>WORLD</span><span id="objects">--</span></div>
+    <div class="row"><span>MODE</span><span class="good">FIRST PERSON</span></div>
+  </div>
+  <div class="bottom">CLICK WORLD TO ENTER // WASD MOVE // MOUSE LOOK // SHIFT SPRINT // ESC RELEASE</div>
+  <div id="command" class="panel">
+    <div class="cmdline"><input id="cmd" placeholder="AETHER command…"><button id="exec">EXEC</button></div>
+    <div class="hint" id="reply">Local command layer online.</div>
+  </div>
 </div>
 
-<script>
-(function(){
-  const $=id=>document.getElementById(id);
-  const log=$('log'), response=$('response');
-  function addLog(msg){const d=document.createElement('div');d.className='line';d.innerHTML='<span>'+new Date().toLocaleTimeString('en-GB')+'</span>'+msg;log.prepend(d);while(log.children.length>9)log.lastChild.remove()}
-  const messages=['Visual cortex synchronized','Background inference complete','Knowledge graph refreshed','Predictive model stabilized','Creative engine standing by','Telemetry packet decoded','Context window optimized','Sensor field recalibrated'];
-  messages.forEach((m,i)=>setTimeout(()=>addLog(m),i*160));
-  let start=Date.now();
-  function tick(){
-    const cpu=72+Math.floor(Math.random()*24), mem=58+Math.floor(Math.random()*14), n=(38+Math.random()*12).toFixed(1);
-    $('cpu').textContent=cpu+'%';$('cpub').style.width=cpu+'%';$('mem').textContent=mem+'%';$('memb').style.width=mem+'%';$('neural').textContent=n;$('neuralb').style.width=(55+Number(n))+'%';
-    $('coherence').textContent=(99.94+Math.random()*.055).toFixed(3)+'%';$('throughput').textContent=(4.4+Math.random()*.9).toFixed(2)+' TB/s';$('entropy').textContent=(.002+Math.random()*.004).toFixed(4);
-    const s=Math.floor((Date.now()-start)/1000),h=Math.floor(s/3600),m=Math.floor(s%3600/60),sec=s%60;$('uptime').textContent=String(h+18).padStart(2,'0')+':'+String(m+42).padStart(2,'0')+':'+String(sec).padStart(2,'0');
-    if(Math.random()<.35)addLog(messages[Math.floor(Math.random()*messages.length)]);
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
   }
-  setInterval(tick,1400);tick();
+}
+</script>
 
-  const bars=$('bars');for(let i=0;i<28;i++){const b=document.createElement('i');b.style.height=(18+Math.random()*90)+'px';bars.appendChild(b)}
-  setInterval(()=>{[...bars.children].forEach(b=>b.style.height=(18+Math.random()*90)+'px')},900);
+<script type="module">
+import * as THREE from "three";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { PointerLockControls } from "three/addons/controls/PointerLockControls.js";
 
-  function execute(text){
-    const q=text.trim().toLowerCase();if(!q)return;
-    let out='Command accepted. Cognitive core is processing.';
-    if(q.includes('diagnostic')){out='Full diagnostics complete. All connected systems nominal.';$('coreState').textContent='DIAGNOSTICS COMPLETE';addLog('Full diagnostics completed — 12/12 nominal')}
-    else if(q.includes('scan')){out='Deep scan complete. No anomalies detected in the simulated environment.';$('coreState').textContent='DEEP SCAN COMPLETE';addLog('Deep system scan completed — no anomalies')}
-    else if(q.includes('simulation')||q.includes('hologram')){out='Holographic simulation initialized. Visualization layer online.';$('coreState').textContent='HOLOGRAPHIC SIMULATION';addLog('Hologram simulation initialized')}
-    else if(q.includes('status')){out='AETHER is online. Coherence 99.982 percent. All systems nominal.';$('coreState').textContent='SYSTEM STATUS NOMINAL';addLog('Operator requested system status')}
-    else if(q.includes('hello')||q.includes('hi')){out='Hello, operator. AETHER is listening.';$('coreState').textContent='ATTENTIVE'}
-    else if(q.includes('who are you')){out='I am AETHER — a fictional cognitive interface for this simulation.';$('coreState').textContent='IDENTITY QUERY'}
-    response.textContent='AETHER // '+out;
-    addLog('Operator command: '+text);
-    if('speechSynthesis' in window){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(out);u.rate=.95;u.pitch=.8;speechSynthesis.speak(u)}
-  }
-  $('send').addEventListener('click',()=>execute($('command').value));
-  $('command').addEventListener('keydown',e=>{if(e.key==='Enter')execute(e.target.value)});
-  document.querySelectorAll('.action').forEach(b=>b.addEventListener('click',()=>execute(b.dataset.action==='diagnostics'?'run diagnostics':b.dataset.action==='scan'?'deep system scan':'start hologram simulation')));
-  $('voice').addEventListener('click',()=>{
-    const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-    if(!SR){response.textContent='AETHER // Voice recognition is not available in this browser.';return}
-    const r=new SR();r.lang='en-US';r.interimResults=false;r.onstart=()=>{$('voiceState').textContent='● LISTENING';response.textContent='AETHER // Listening…'};r.onresult=e=>{$('command').value=e.results[0][0].transcript;execute($('command').value)};r.onerror=()=>response.textContent='AETHER // Voice input interrupted.';r.onend=()=>$('voiceState').textContent='● READY';r.start();
+const canvas=document.getElementById("world");
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,preserveDrawingBuffer:false});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.setSize(innerWidth,innerHeight);
+renderer.shadowMap.enabled=true;
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1.05;
+
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x020508);
+scene.fog=new THREE.FogExp2(0x071217,0.012);
+
+const camera=new THREE.PerspectiveCamera(72,innerWidth/innerHeight,.05,1200);
+camera.position.set(0,3,8);
+
+const controls=new PointerLockControls(camera,document.body);
+controls.pointerSpeed=.65;
+
+const ambient=new THREE.HemisphereLight(0x8defff,0x120b06,1.35);
+scene.add(ambient);
+const moon=new THREE.DirectionalLight(0xc7f6ff,2.0);
+moon.position.set(20,40,10);
+moon.castShadow=true;
+scene.add(moon);
+
+const grid=new THREE.GridHelper(300,120,0x0b3a45,0x06242b);
+grid.position.y=0;
+grid.material.transparent=true;
+grid.material.opacity=.18;
+scene.add(grid);
+
+let world=null, mixer=null, clock=new THREE.Clock(), keys={}, velocity=new THREE.Vector3();
+let canMove=false, onGround=true, last=performance.now(), frames=0, fps=0;
+const ray=new THREE.Raycaster();
+const downRay=new THREE.Raycaster();
+const blockers=[];
+
+function setState(t){document.getElementById("state").textContent=t}
+function loadWorld(file){
+  const url=URL.createObjectURL(file);
+  setState("LOADING WORLD");
+  new GLTFLoader().load(url,g=>{
+    if(world) scene.remove(world);
+    world=g.scene;
+    world.traverse(o=>{
+      if(o.isMesh){
+        o.castShadow=true;o.receiveShadow=true;
+        if(o.material){
+          o.material.side=THREE.FrontSide;
+          if("envMapIntensity" in o.material)o.material.envMapIntensity=1.1;
+        }
+        blockers.push(o);
+      }
+    });
+    scene.add(world);
+    if(g.animations.length){mixer=new THREE.AnimationMixer(world);g.animations.forEach(a=>mixer.clipAction(a).play())}
+    const box=new THREE.Box3().setFromObject(world);
+    const center=box.getCenter(new THREE.Vector3());
+    const size=box.getSize(new THREE.Vector3());
+    camera.position.set(center.x,Math.max(box.min.y+2,center.y-size.y*.35),center.z+Math.min(size.z*.35,14));
+    grid.position.y=box.min.y;
+    scene.fog.density=Math.max(.003,Math.min(.014,8/(Math.max(size.x,size.z)*4)));
+    document.getElementById("objects").textContent=world.children.length+" ROOT";
+    document.getElementById("command").style.display="block";
+    document.getElementById("boot").style.display="none";
+    setState("WORLD ONLINE");
+    URL.revokeObjectURL(url);
+  },xhr=>{
+    if(xhr.total)document.getElementById("bootmsg").textContent="LOADING "+Math.round(xhr.loaded/xhr.total*100)+"%";
+  },err=>{
+    console.error(err);
+    document.getElementById("bootmsg").textContent="LOAD ERROR — CHECK THE GLB FILE";
+    setState("LOAD ERROR");
   });
+}
 
-  const c=$('stars'),ctx=c.getContext('2d');let W,H,pts=[];
-  function resize(){W=c.width=innerWidth*devicePixelRatio;H=c.height=innerHeight*devicePixelRatio;pts=Array.from({length:180},()=>({x:Math.random()*W,y:Math.random()*H,z:Math.random()*1+.2,v:Math.random()*.35+.05}))}
-  function draw(){ctx.clearRect(0,0,W,H);for(const p of pts){p.y+=p.v*p.z;if(p.y>H)p.y=0;ctx.fillStyle='rgba(120,230,255,'+(p.z*.28)+')';ctx.fillRect(p.x,p.y,1.2*p.z,1.2*p.z)}requestAnimationFrame(draw)}
-  addEventListener('resize',resize);resize();draw();
-})();
+document.getElementById("load").onclick=()=>document.getElementById("file").click();
+document.getElementById("file").onchange=e=>{if(e.target.files[0])loadWorld(e.target.files[0])};
+
+document.addEventListener("keydown",e=>{
+  keys[e.code]=true;
+  if(e.code==="KeyE"){document.getElementById("command").style.display="block";document.getElementById("cmd").focus()}
+});
+document.addEventListener("keyup",e=>keys[e.code]=false);
+document.body.addEventListener("click",()=>{
+  if(world && !document.getElementById("command").contains(document.activeElement)) controls.lock();
+});
+
+controls.addEventListener("lock",()=>{canMove=true;setState("EXPLORATION ACTIVE")});
+controls.addEventListener("unlock",()=>{canMove=false;setState("WORLD PAUSED")});
+
+function move(dt){
+  if(!canMove||!world)return;
+  const speed=keys.ShiftLeft||keys.ShiftRight?10:5;
+  const dir=new THREE.Vector3();
+  if(keys.KeyW)dir.z-=1;if(keys.KeyS)dir.z+=1;if(keys.KeyA)dir.x-=1;if(keys.KeyD)dir.x+=1;
+  if(dir.lengthSq())dir.normalize();
+  const forward=new THREE.Vector3();
+  camera.getWorldDirection(forward);forward.y=0;forward.normalize();
+  const right=new THREE.Vector3().crossVectors(forward,camera.up).normalize();
+  const delta=new THREE.Vector3().addScaledVector(forward,-dir.z*speed*dt).addScaledVector(right,dir.x*speed*dt);
+  const next=camera.position.clone().add(delta);
+  const oldY=camera.position.y;
+  camera.position.x=next.x;camera.position.z=next.z;
+  // Simple floor following via downward raycast.
+  downRay.set(new THREE.Vector3(camera.position.x,camera.position.y+20,camera.position.z),new THREE.Vector3(0,-1,0));
+  const hits=downRay.intersectObjects(blockers,true);
+  if(hits.length){
+    const floorY=hits[0].point.y;
+    const targetY=floorY+1.7;
+    if(targetY<camera.position.y+2.5)camera.position.y=THREE.MathUtils.lerp(camera.position.y,targetY,.35);
+  }
+}
+
+function command(text){
+  const q=text.toLowerCase();
+  let r="Command acknowledged.";
+  if(q.includes("status"))r="AETHER // WORLD ONLINE // EXPLORATION READY.";
+  else if(q.includes("center")||q.includes("home")){camera.position.set(0,4,8);r="Navigation vector reset to origin."}
+  else if(q.includes("fog")){scene.fog.density=.02;r="Atmospheric density increased."}
+  else if(q.includes("clear")){scene.fog.density=.006;r="Atmospheric density reduced."}
+  else if(q.includes("pause")){controls.unlock();r="Exploration paused."}
+  else if(q.includes("full screen"))document.documentElement.requestFullscreen?.(),r="Fullscreen requested.";
+  else r="Local AETHER layer can navigate and modify the simulation. GPT control comes in the next integration.";
+  document.getElementById("reply").textContent="AETHER // "+r;
+}
+document.getElementById("exec").onclick=()=>{command(document.getElementById("cmd").value);document.getElementById("cmd").value=""};
+document.getElementById("cmd").addEventListener("keydown",e=>{if(e.key==="Enter")document.getElementById("exec").click()});
+
+function animate(){
+  requestAnimationFrame(animate);
+  const now=performance.now();const dt=Math.min(.05,(now-last)/1000);last=now;
+  frames++;if(now%1000<20){fps=Math.round(frames);frames=0}
+  move(dt);if(mixer)mixer.update(dt);
+  const p=camera.position;document.getElementById("pos").textContent=p.x.toFixed(1)+" / "+p.y.toFixed(1)+" / "+p.z.toFixed(1);
+  document.getElementById("fps").textContent=fps||"--";
+  renderer.render(scene,camera);
+}
+animate();
+
+addEventListener("resize",()=>{
+  camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth,innerHeight);
+});
 </script>
 </body>
 </html>
