@@ -7,111 +7,128 @@
 
 <style>
 *{box-sizing:border-box}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#050403}
+
+html,body{
+    margin:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#050403;
+}
+
 canvas{display:block}
 
 #hud{
-position:fixed;
-top:18px;
-left:20px;
-z-index:10;
-color:#eee4d2;
-font-family:Arial,sans-serif;
-text-shadow:0 0 14px #000;
-pointer-events:none;
+    position:fixed;
+    top:18px;
+    left:20px;
+    z-index:10;
+    color:#eee4d2;
+    font-family:Arial,sans-serif;
+    text-shadow:0 0 14px #000;
+    pointer-events:none;
 }
 
 #title{
-font-size:18px;
-font-weight:bold;
-letter-spacing:3px;
+    font-size:18px;
+    font-weight:bold;
+    letter-spacing:3px;
 }
 
 #status{
-margin-top:7px;
-font-size:11px;
-letter-spacing:2px;
-opacity:.65;
+    margin-top:7px;
+    font-size:11px;
+    letter-spacing:2px;
+    opacity:.65;
 }
 
 #start{
-position:fixed;
-inset:0;
-z-index:20;
-display:flex;
-align-items:center;
-justify-content:center;
-background:radial-gradient(circle,#241b1255,#000 80%);
-cursor:pointer;
-color:white;
-font-family:Arial,sans-serif;
-text-align:center;
+    position:fixed;
+    inset:0;
+    z-index:20;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:radial-gradient(circle,#241b1255,#000 80%);
+    cursor:pointer;
+    color:white;
+    font-family:Arial,sans-serif;
+    text-align:center;
 }
 
 .box{
-padding:35px 55px;
-background:#090705dd;
-border:1px solid #c7a86a55;
-box-shadow:0 0 80px #000;
+    padding:35px 55px;
+    background:#090705dd;
+    border:1px solid #c7a86a55;
+    box-shadow:0 0 80px #000;
 }
 
 .box h1{
-margin:0 0 15px;
-font-size:28px;
-letter-spacing:8px;
+    margin:0 0 15px;
+    font-size:28px;
+    letter-spacing:8px;
 }
 
 .box p{
-font-size:11px;
-letter-spacing:3px;
-opacity:.6;
+    font-size:11px;
+    letter-spacing:3px;
+    opacity:.6;
 }
 
 #cross{
-position:fixed;
-left:50%;
-top:50%;
-width:9px;
-height:9px;
-transform:translate(-50%,-50%);
-z-index:9;
-pointer-events:none;
+    position:fixed;
+    left:50%;
+    top:50%;
+    width:9px;
+    height:9px;
+    transform:translate(-50%,-50%);
+    z-index:9;
+    pointer-events:none;
 }
 
 #cross:before,#cross:after{
-content:"";
-position:absolute;
-background:#e8d9b988;
+    content:"";
+    position:absolute;
+    background:#e8d9b988;
 }
 
-#cross:before{width:9px;height:1px;top:4px}
-#cross:after{height:9px;width:1px;left:4px}
+#cross:before{
+    width:9px;
+    height:1px;
+    top:4px;
+}
+
+#cross:after{
+    height:9px;
+    width:1px;
+    left:4px;
+}
 </style>
 </head>
 
 <body>
 
 <div id="hud">
-<div id="title">LIBRARY OF BABEL // AETHER</div>
-<div id="status">LOADING ARCHIVE...</div>
+    <div id="title">LIBRARY OF BABEL // AETHER</div>
+    <div id="status">LOADING ARCHIVE...</div>
 </div>
 
 <div id="cross"></div>
 
 <div id="start">
-<div class="box">
-<h1>LIBRARY OF BABEL</h1>
-<p>CLICK TO ENTER</p>
-<p>WASD · MOUSE · SHIFT TO SPRINT · ESC TO RELEASE</p>
-</div>
+    <div class="box">
+        <h1>LIBRARY OF BABEL</h1>
+        <p>CLICK TO ENTER</p>
+        <p>WASD · MOUSE · SPACE · SHIFT TO SPRINT · ESC</p>
+    </div>
 </div>
 
 <script type="importmap">
 {
-"imports":{
-"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
-"three/addons/":"https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
-}
+    "imports":{
+        "three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+        "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
+    }
 }
 </script>
 
@@ -126,685 +143,1027 @@ import {UnrealBloomPass} from "three/addons/postprocessing/UnrealBloomPass.js";
 import {OutputPass} from "three/addons/postprocessing/OutputPass.js";
 
 
-/* =========================
+/* =========================================================
    SCENE
-========================= */
+========================================================= */
 
-const scene=new THREE.Scene();
+const scene = new THREE.Scene();
 
-scene.background=new THREE.Color(0x050403);
+scene.background = new THREE.Color(0x050403);
 
-scene.fog=new THREE.FogExp2(
-0x17130f,
-0.008
+scene.fog = new THREE.FogExp2(
+    0x17130f,
+    0.007
 );
 
 
-/* =========================
+/* =========================================================
    CAMERA
-========================= */
+========================================================= */
 
-const camera=new THREE.PerspectiveCamera(
-72,
-innerWidth/innerHeight,
-0.05,
-300
-);
-
-camera.position.set(
-0,
-3,
--30
+const camera = new THREE.PerspectiveCamera(
+    72,
+    innerWidth / innerHeight,
+    0.05,
+    350
 );
 
 
-/* =========================
+/* =========================================================
    RENDERER
-========================= */
+========================================================= */
 
-const renderer=new THREE.WebGLRenderer({
-antialias:true,
-powerPreference:"high-performance"
+const renderer = new THREE.WebGLRenderer({
+    antialias:true,
+    powerPreference:"high-performance"
 });
 
-renderer.setSize(innerWidth,innerHeight);
+renderer.setSize(
+    innerWidth,
+    innerHeight
+);
 
 renderer.setPixelRatio(
-Math.min(devicePixelRatio,1.5)
+    Math.min(devicePixelRatio,1.5)
 );
 
-renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.outputColorSpace =
+    THREE.SRGBColorSpace;
 
-renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMapping =
+    THREE.ACESFilmicToneMapping;
 
-renderer.toneMappingExposure=1.25;
+renderer.toneMappingExposure = 1.18;
 
-renderer.shadowMap.enabled=true;
+renderer.shadowMap.enabled = true;
 
-renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.shadowMap.type =
+    THREE.PCFSoftShadowMap;
 
-document.body.appendChild(renderer.domElement);
+document.body.appendChild(
+    renderer.domElement
+);
 
 
-/* =========================
-   CINEMATIC POST
-========================= */
+/* =========================================================
+   POST PROCESSING
+========================================================= */
 
-const composer=new EffectComposer(renderer);
+const composer =
+    new EffectComposer(renderer);
 
 composer.addPass(
-new RenderPass(scene,camera)
+    new RenderPass(scene,camera)
 );
 
-const bloom=new UnrealBloomPass(
-new THREE.Vector2(innerWidth,innerHeight),
-0.16,
-0.55,
-0.88
-);
+const bloom =
+    new UnrealBloomPass(
+        new THREE.Vector2(
+            innerWidth,
+            innerHeight
+        ),
+        0.14,
+        0.55,
+        0.9
+    );
 
 composer.addPass(bloom);
 
 composer.addPass(
-new OutputPass()
+    new OutputPass()
 );
 
 
-/* =========================
+/* =========================================================
    LIGHTING
-========================= */
+========================================================= */
 
-const hemi=new THREE.HemisphereLight(
-0xffe8c4,
-0x090604,
-1.8
-);
+const hemi =
+    new THREE.HemisphereLight(
+        0xffe8c4,
+        0x090604,
+        1.65
+    );
 
 scene.add(hemi);
 
 
-const sun=new THREE.DirectionalLight(
-0xffd29a,
-2.2
-);
+const sun =
+    new THREE.DirectionalLight(
+        0xffd09a,
+        2.0
+    );
 
 sun.position.set(
--25,
-45,
--30
+    -25,
+    45,
+    -30
 );
 
-sun.castShadow=true;
+sun.castShadow = true;
 
 sun.shadow.mapSize.set(
-1024,
-1024
+    1024,
+    1024
 );
 
-sun.shadow.camera.near=1;
-sun.shadow.camera.far=180;
+sun.shadow.camera.near = 1;
+sun.shadow.camera.far = 180;
 
-sun.shadow.camera.left=-80;
-sun.shadow.camera.right=80;
-sun.shadow.camera.top=80;
-sun.shadow.camera.bottom=-80;
+sun.shadow.camera.left = -80;
+sun.shadow.camera.right = 80;
+sun.shadow.camera.top = 80;
+sun.shadow.camera.bottom = -80;
 
 scene.add(sun);
 
 
-/* warm architectural lights */
+/* =========================================================
+   LIGHT HELPER
+========================================================= */
 
-function addLight(x,y,z,color,intensity,distance){
+function addLight(
+    x,
+    y,
+    z,
+    color,
+    intensity,
+    distance
+){
 
-const l=new THREE.PointLight(
-color,
-intensity,
-distance,
-2
-);
+    const light =
+        new THREE.PointLight(
+            color,
+            intensity,
+            distance,
+            2
+        );
 
-l.position.set(x,y,z);
+    light.position.set(
+        x,y,z
+    );
 
-scene.add(l);
-
+    scene.add(light);
 }
 
 
-/* warm pools */
+/* Main architectural lights */
 
-addLight(0,10,-20,0xffa34d,180,55);
-addLight(-20,15,0,0xffb45c,150,50);
-addLight(20,18,5,0xffc477,170,55);
-addLight(0,25,20,0xffc985,200,65);
+addLight(
+    0,10,-20,
+    0xffa34d,
+    150,
+    55
+);
 
-addLight(-25,8,-25,0x7d96c4,70,45);
-addLight(25,12,-15,0x7d96c4,60,45);
+addLight(
+    -20,15,0,
+    0xffb45c,
+    130,
+    50
+);
+
+addLight(
+    20,18,5,
+    0xffc477,
+    150,
+    55
+);
+
+addLight(
+    0,25,20,
+    0xffc985,
+    170,
+    65
+);
+
+addLight(
+    -25,8,-25,
+    0x7d96c4,
+    60,
+    45
+);
+
+addLight(
+    25,12,-15,
+    0x7d96c4,
+    55,
+    45
+);
 
 
-/* =========================
-   MATERIAL ENHANCEMENT
-========================= */
+/* =========================================================
+   MATERIAL TUNING
+========================================================= */
 
 function tuneMaterial(m){
 
-if(!m || !m.name) return;
+    if(!m || !m.name)
+        return;
 
-const n=m.name.toLowerCase();
+    const n =
+        m.name.toLowerCase();
 
-if(!m.color)
-return;
+    if(!m.color)
+        return;
 
 
-/* stone */
+    /* STONE */
 
-if(
-n.includes("stone") ||
-n.includes("carved")
-){
-m.color.set("#776a5a");
-m.roughness=.78;
-m.metalness=0;
+    if(
+        n.includes("stone") ||
+        n.includes("carved")
+    ){
+
+        m.color.set("#776a5a");
+
+        m.roughness = .78;
+
+        m.metalness = 0;
+    }
+
+
+    /* MARBLE */
+
+    else if(
+        n.includes("marble")
+    ){
+
+        m.color.set("#aaa08e");
+
+        m.roughness = .55;
+
+        m.metalness = 0;
+    }
+
+
+    /* GOLD */
+
+    else if(
+        n.includes("gold")
+    ){
+
+        m.color.set("#b8893e");
+
+        m.roughness = .34;
+
+        m.metalness = .72;
+    }
+
+
+    /* WOOD */
+
+    else if(
+        n.includes("wood")
+    ){
+
+        m.color.set("#3b2115");
+
+        m.roughness = .82;
+
+        m.metalness = 0;
+    }
+
+
+    /* RED BOOKS */
+
+    else if(
+        n.includes("red books")
+    ){
+
+        m.color.set("#72251e");
+
+        m.roughness = .9;
+
+        m.metalness = 0;
+    }
+
+
+    /* BLUE BOOKS */
+
+    else if(
+        n.includes("blue books")
+    ){
+
+        m.color.set("#263e63");
+
+        m.roughness = .9;
+
+        m.metalness = 0;
+    }
+
+
+    /* OLD BOOKS */
+
+    else if(
+        n.includes("old books")
+    ){
+
+        m.color.set("#55402b");
+
+        m.roughness = .88;
+
+        m.metalness = 0;
+    }
+
+
+    /* BOOKS */
+
+    else if(
+        n.includes("book")
+    ){
+
+        m.color.set("#4b3525");
+
+        m.roughness = .88;
+
+        m.metalness = 0;
+    }
+
+
+    /* IRON */
+
+    else if(
+        n.includes("iron")
+    ){
+
+        m.color.set("#242528");
+
+        m.roughness = .55;
+
+        m.metalness = .6;
+    }
+
 }
 
 
-/* marble */
+/* =========================================================
+   LIBRARY LOADING
+========================================================= */
 
-else if(n.includes("marble")){
+const loader =
+    new GLTFLoader();
 
-m.color.set("#aaa08e");
-m.roughness=.55;
-m.metalness=0;
-}
+let library = null;
 
+let worldBox = null;
 
-/* gold */
+let worldCenter = null;
 
-else if(
-n.includes("gold") ||
-n.includes("aged gold")
-){
-
-m.color.set("#b8893e");
-m.roughness=.35;
-m.metalness=.72;
-
-}
+let worldFloor = 0;
 
 
-/* normal wood */
-
-else if(
-n.includes("wood")
-){
-
-m.color.set("#3b2115");
-m.roughness=.82;
-m.metalness=0;
-
-}
-
-
-/* books */
-
-else if(
-n.includes("red books")
-){
-
-m.color.set("#72251e");
-m.roughness=.9;
-m.metalness=0;
-
-}
-
-else if(
-n.includes("blue books")
-){
-
-m.color.set("#263e63");
-m.roughness=.9;
-m.metalness=0;
-
-}
-
-else if(
-n.includes("old books")
-){
-
-m.color.set("#55402b");
-m.roughness=.88;
-m.metalness=0;
-
-}
-
-else if(
-n.includes("book")
-){
-
-m.color.set("#4b3525");
-m.roughness=.88;
-m.metalness=0;
-
-}
-
-
-/* leather */
-
-else if(n.includes("leather")){
-
-m.color.set("#351c13");
-m.roughness=.82;
-m.metalness=0;
-
-}
-
-
-/* iron */
-
-else if(n.includes("iron")){
-
-m.color.set("#242528");
-m.roughness=.55;
-m.metalness=.65;
-
-}
-
-}
-
-
-/* =========================
-   LOAD LIBRARY
-========================= */
-
-const loader=new GLTFLoader();
-
-let world=null;    
 loader.load(
 
-"babel_library_v10.glb",
+    "babel_library_v10.glb",
 
-(gltf)=>{
+    (gltf)=>{
 
-const root=gltf.scene;
-world=root;
+        library = gltf.scene;
 
-scene.add(root);
-
-
-/* DO NOT CENTER OR RESCALE THE BLENDER WORLD */
-
-root.traverse(obj=>{
-
-if(!obj.isMesh)
-return;
-
-obj.castShadow=false;
-obj.receiveShadow=true;
-
-if(obj.material){
-
-const mats=Array.isArray(obj.material)
-?obj.material
-:[obj.material];
-
-mats.forEach(m=>{
-
-tuneMaterial(m);
-
-m.needsUpdate=true;
-
-});
-
-}
-
-});
+        scene.add(library);
 
 
-/* =========================
-   FIND WORLD SIZE
-========================= */
+        /* Material + mesh setup */
 
-const box=new THREE.Box3()
-.setFromObject(root);
+        library.traverse(
+            obj=>{
 
-const center=box.getCenter(
-new THREE.Vector3()
+                if(!obj.isMesh)
+                    return;
+
+                obj.castShadow = false;
+
+                obj.receiveShadow = true;
+
+
+                if(obj.material){
+
+                    const materials =
+                        Array.isArray(
+                            obj.material
+                        )
+                        ? obj.material
+                        : [obj.material];
+
+
+                    materials.forEach(
+                        material=>{
+
+                            tuneMaterial(
+                                material
+                            );
+
+                            material.needsUpdate =
+                                true;
+
+                        }
+                    );
+
+                }
+
+            }
+        );
+
+
+        /* Calculate actual Blender bounds */
+
+        worldBox =
+            new THREE.Box3()
+            .setFromObject(
+                library
+            );
+
+        worldCenter =
+            worldBox.getCenter(
+                new THREE.Vector3()
+            );
+
+        worldFloor =
+            worldBox.min.y;
+
+
+        /* Spawn near front-center */
+
+        camera.position.set(
+
+            worldCenter.x,
+
+            worldFloor + 3,
+
+            worldCenter.z - 25
+
+        );
+
+
+        /* Look toward library */
+
+        camera.lookAt(
+
+            worldCenter.x,
+
+            worldFloor + 8,
+
+            worldCenter.z
+
+        );
+
+
+        /* Extra lights based on actual world */
+
+        for(
+            let i=0;
+            i<8;
+            i++
+        ){
+
+            const angle =
+                (i/8) *
+                Math.PI * 2;
+
+            const radius = 24;
+
+            const x =
+                worldCenter.x +
+                Math.cos(angle)*radius;
+
+            const z =
+                worldCenter.z +
+                Math.sin(angle)*radius;
+
+            addLight(
+
+                x,
+
+                worldFloor +
+                9 +
+                (i%3)*6,
+
+                z,
+
+                i%2
+                ?0xffa95c
+                :0xffd08a,
+
+                65,
+
+                38
+            );
+
+        }
+
+
+        document
+        .getElementById("status")
+        .textContent =
+        "ARCHIVE ONLINE // V10 // WASD + SPACE";
+
+    },
+
+    undefined,
+
+    error=>{
+
+        console.error(
+            "GLB ERROR:",
+            error
+        );
+
+        document
+        .getElementById("status")
+        .textContent =
+        "ARCHIVE LOAD ERROR";
+
+    }
+
 );
 
-const size=box.getSize(
-new THREE.Vector3()
-);
 
+/* =========================================================
+   POINTER LOCK
+========================================================= */
 
-/* =========================
-   PLAYER START
-========================= */
+const controls =
+    new PointerLockControls(
+        camera,
+        document.body
+    );
 
-camera.position.set(
-center.x,
-box.min.y+2.2,
-center.z-30
-);
-
-
-/* look into library */
-
-const target=new THREE.Vector3(
-center.x,
-box.min.y+9,
-center.z
-);
-
-camera.lookAt(target);
-
-
-/* =========================
-   MORE LIGHTS AROUND WORLD
-========================= */
-
-for(let i=0;i<7;i++){
-
-const a=(i/7)*Math.PI*2;
-
-const x=center.x+
-Math.cos(a)*22;
-
-const z=center.z+
-Math.sin(a)*22;
-
-addLight(
-x,
-box.min.y+10+(i%3)*7,
-z,
-i%2
-?0xffa95c
-:0xffd08a,
-85,
-38
-);
-
-}
-
-
-document.getElementById("status").textContent=
-"ARCHIVE ONLINE // V10 // AETHER";
-
-
-},
-
-undefined,
-
-(error)=>{
-
-console.error(error);
-
-document.getElementById("status").textContent=
-"ARCHIVE LOAD ERROR";
-
-}
-
-);
-
-
-/* =========================
-   CONTROLS
-========================= */
-
-const controls=
-new PointerLockControls(
-camera,
-document.body
-);
 
 document
 .getElementById("start")
 .addEventListener(
-"click",
-()=>{
-controls.lock();
-}
-);
-
-controls.addEventListener(
-"lock",
-()=>{
-document.getElementById("start")
-.style.display="none";
-}
-);
-
-controls.addEventListener(
-"unlock",
-()=>{
-document.getElementById("start")
-.style.display="flex";
-}
-);
-
-
-/* =========================
-   MOVEMENT + JUMP + STAIRS
-========================= */
-
-const keys={};
-let velocityY=0;
-let grounded=false;
-
-const gravity=28;
-const jumpPower=10;
-const playerHeight=1.8;
-const stepHeight=0.75;
-
-const raycaster=new THREE.Raycaster();
-const downDirection=new THREE.Vector3(0,-1,0);
-
-addEventListener("keydown",e=>{
-    keys[e.code]=true;
-
-    if(
-        e.code==="Space" &&
-        grounded
-    ){
-        velocityY=jumpPower;
-        grounded=false;
+    "click",
+    ()=>{
+        controls.lock();
     }
-});
+);
 
-addEventListener("keyup",e=>{
-    keys[e.code]=false;
-});
 
-function getFloorY(){
+controls.addEventListener(
+    "lock",
+    ()=>{
 
-    raycaster.set(
-        camera.position,
-        downDirection
+        document
+        .getElementById("start")
+        .style.display =
+        "none";
+
+    }
+);
+
+
+controls.addEventListener(
+    "unlock",
+    ()=>{
+
+        document
+        .getElementById("start")
+        .style.display =
+        "flex";
+
+    }
+);
+
+
+/* =========================================================
+   PLAYER
+========================================================= */
+
+const keys = {};
+
+let velocityY = 0;
+
+let grounded = false;
+
+const gravity = 28;
+
+const jumpPower = 10;
+
+const playerHeight = 1.8;
+
+const maxStepHeight = 1.0;
+
+
+/* =========================================================
+   RAYCASTING
+========================================================= */
+
+const floorRay =
+    new THREE.Raycaster();
+
+const down =
+    new THREE.Vector3(
+        0,
+        -1,
+        0
     );
 
-    const hits=raycaster.intersectObjects(
-        scene.children,
-        true
+
+function getFloorHeight(){
+
+    if(!library)
+        return null;
+
+
+    /*
+       Start slightly above player.
+       Look downward through stairs,
+       floors and platforms.
+    */
+
+    const origin =
+        new THREE.Vector3(
+            camera.position.x,
+            camera.position.y + .7,
+            camera.position.z
+        );
+
+
+    floorRay.set(
+        origin,
+        down
     );
 
-    for(const hit of hits){
+
+    const hits =
+        floorRay.intersectObject(
+            library,
+            true
+        );
+
+
+    for(
+        const hit of hits
+    ){
 
         if(
-            hit.object.isMesh &&
-            hit.point.y <= camera.position.y + 2
+            hit.object &&
+            hit.object.isMesh
         ){
+
             return hit.point.y;
+
         }
+
     }
+
 
     return null;
 }
 
+
+/* =========================================================
+   INPUT
+========================================================= */
+
+addEventListener(
+    "keydown",
+    event=>{
+
+        keys[event.code] = true;
+
+
+        /* JUMP */
+
+        if(
+            event.code === "Space" &&
+            grounded
+        ){
+
+            velocityY =
+                jumpPower;
+
+            grounded = false;
+
+        }
+
+    }
+);
+
+
+addEventListener(
+    "keyup",
+    event=>{
+
+        keys[event.code] = false;
+
+    }
+);
+
+
+/* =========================================================
+   MOVEMENT
+========================================================= */
+
 function movement(dt){
 
-    if(!controls.isLocked)
+    if(
+        !controls.isLocked
+    )
         return;
 
-    const speed=
-        (keys.ShiftLeft||keys.ShiftRight)
+
+    const speed =
+        (
+            keys.ShiftLeft ||
+            keys.ShiftRight
+        )
         ?14
         :6;
 
-    /* horizontal movement */
+
+    /*
+       Remember floor before moving.
+    */
+
+    const oldFloor =
+        getFloorHeight();
+
+
+    const oldY =
+        camera.position.y;
+
+
+    /* ======================
+       HORIZONTAL
+    ====================== */
 
     if(keys.KeyW)
-        controls.moveForward(speed*dt);
+        controls.moveForward(
+            speed * dt
+        );
+
 
     if(keys.KeyS)
-        controls.moveForward(-speed*dt);
+        controls.moveForward(
+            -speed * dt
+        );
+
 
     if(keys.KeyA)
-        controls.moveRight(-speed*dt);
+        controls.moveRight(
+            -speed * dt
+        );
+
 
     if(keys.KeyD)
-        controls.moveRight(speed*dt);
+        controls.moveRight(
+            speed * dt
+        );
 
 
-    /* gravity */
+    /*
+       Find surface after movement.
+       This is what lets the player
+       climb individual stairs.
+    */
 
-    velocityY-=gravity*dt;
+    const newFloor =
+        getFloorHeight();
 
-    camera.position.y+=velocityY*dt;
+
+    if(
+        oldFloor !== null &&
+        newFloor !== null
+    ){
+
+        const difference =
+            newFloor - oldFloor;
 
 
-    /* floor detection */
+        /*
+           STEP UP
 
-    const floor=getFloorY();
+           If the next surface is
+           higher but not too high,
+           smoothly place player on it.
+        */
 
-    if(floor!==null){
+        if(
+            difference > 0 &&
+            difference <= maxStepHeight &&
+            velocityY <= 0
+        ){
 
-        const targetY=floor+playerHeight;
+            camera.position.y =
+                newFloor +
+                playerHeight;
 
-        if(camera.position.y<=targetY){
+            velocityY = 0;
 
-            camera.position.y=targetY;
-            velocityY=0;
-            grounded=true;
+            grounded = true;
 
         }
 
     }
 
 
-    /* don't fall forever */
+    /* ======================
+       GRAVITY
+    ====================== */
 
-    if(camera.position.y<0){
+    velocityY -=
+        gravity * dt;
 
-        camera.position.y=playerHeight;
-        velocityY=0;
-        grounded=true;
+
+    camera.position.y +=
+        velocityY * dt;
+
+
+    /*
+       Current floor after
+       movement + vertical motion.
+    */
+
+    const floor =
+        getFloorHeight();
+
+
+    if(
+        floor !== null
+    ){
+
+        const targetY =
+            floor +
+            playerHeight;
+
+
+        /*
+           Land on floor/stair.
+        */
+
+        if(
+            camera.position.y <=
+            targetY
+        ){
+
+            camera.position.y =
+                targetY;
+
+            velocityY = 0;
+
+            grounded = true;
+
+        }
+
+    }
+
+
+    /*
+       Prevent falling forever
+       outside the building.
+    */
+
+    if(
+        camera.position.y <
+        worldFloor - 10
+    ){
+
+        camera.position.set(
+
+            worldCenter.x,
+
+            worldFloor + 3,
+
+            worldCenter.z - 25
+
+        );
+
+        velocityY = 0;
+
+        grounded = false;
 
     }
 
 }
 
-/* =========================
+
+/* =========================================================
    DUST
-========================= */
+========================================================= */
 
-const dustGeometry=
-new THREE.BufferGeometry();
+const dustGeometry =
+    new THREE.BufferGeometry();
 
-const count=900;
+const dustCount = 800;
 
-const positions=
-new Float32Array(count*3);
+const dustPositions =
+    new Float32Array(
+        dustCount * 3
+    );
 
-for(let i=0;i<count;i++){
 
-positions[i*3]=
-(Math.random()-.5)*100;
+for(
+    let i=0;
+    i<dustCount;
+    i++
+){
 
-positions[i*3+1]=
-Math.random()*45;
+    dustPositions[i*3] =
+        (Math.random()-.5)*110;
 
-positions[i*3+2]=
-(Math.random()-.5)*100;
+    dustPositions[i*3+1] =
+        Math.random()*50;
+
+    dustPositions[i*3+2] =
+        (Math.random()-.5)*110;
 
 }
+
 
 dustGeometry.setAttribute(
-"position",
-new THREE.BufferAttribute(
-positions,
-3
-)
+    "position",
+    new THREE.BufferAttribute(
+        dustPositions,
+        3
+    )
 );
 
-const dustMaterial=
-new THREE.PointsMaterial({
 
-color:0xd8c6a8,
+const dustMaterial =
+    new THREE.PointsMaterial({
 
-size:.025,
+        color:0xd8c6a8,
 
-transparent:true,
+        size:.025,
 
-opacity:.16,
+        transparent:true,
 
-depthWrite:false
+        opacity:.14,
 
-});
+        depthWrite:false
+
+    });
+
 
 scene.add(
-new THREE.Points(
-dustGeometry,
-dustMaterial
-)
+    new THREE.Points(
+        dustGeometry,
+        dustMaterial
+    )
 );
 
 
-/* =========================
+/* =========================================================
    RESIZE
-========================= */
+========================================================= */
 
 addEventListener(
-"resize",
-()=>{
+    "resize",
+    ()=>{
 
-camera.aspect=
-innerWidth/innerHeight;
+        camera.aspect =
+            innerWidth /
+            innerHeight;
 
-camera.updateProjectionMatrix();
+        camera.updateProjectionMatrix();
 
-renderer.setSize(
-innerWidth,
-innerHeight
+
+        renderer.setSize(
+            innerWidth,
+            innerHeight
+        );
+
+
+        composer.setSize(
+            innerWidth,
+            innerHeight
+        );
+
+    }
 );
 
-composer.setSize(
-innerWidth,
-innerHeight
-);
 
-}
-);
+/* =========================================================
+   GAME LOOP
+========================================================= */
 
+const clock =
+    new THREE.Clock();
 
-/* =========================
-   LOOP
-========================= */
 
 function animate(){
 
-requestAnimationFrame(
-animate
-);
+    requestAnimationFrame(
+        animate
+    );
 
-const dt=
-Math.min(
-clock.getDelta(),
-.05
-);
 
-movement(dt);
+    const dt =
+        Math.min(
+            clock.getDelta(),
+            .05
+        );
 
-composer.render();
+
+    movement(dt);
+
+
+    composer.render();
 
 }
+
 
 animate();
 
