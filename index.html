@@ -3,34 +3,89 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>LIBRARY OF BABEL</title>
+<title>LIBRARY OF BABEL // AETHER</title>
 
 <style>
 *{box-sizing:border-box}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#030405;font-family:Arial,sans-serif}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#050403}
 canvas{display:block}
+
 #hud{
-position:fixed;top:20px;left:20px;z-index:10;
-color:#d8e8ff;font-size:12px;letter-spacing:2px;
-text-shadow:0 0 12px #6aa9ff;pointer-events:none
+position:fixed;
+top:18px;
+left:20px;
+z-index:10;
+color:#eee4d2;
+font-family:Arial,sans-serif;
+text-shadow:0 0 14px #000;
+pointer-events:none;
 }
-#title{font-size:18px;font-weight:bold}
-#status{margin-top:8px;opacity:.65}
+
+#title{
+font-size:18px;
+font-weight:bold;
+letter-spacing:3px;
+}
+
+#status{
+margin-top:7px;
+font-size:11px;
+letter-spacing:2px;
+opacity:.65;
+}
+
 #start{
-position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
-z-index:20;background:radial-gradient(circle,#18202b55,#000 75%);
-color:white;cursor:pointer;text-align:center
+position:fixed;
+inset:0;
+z-index:20;
+display:flex;
+align-items:center;
+justify-content:center;
+background:radial-gradient(circle,#241b1255,#000 80%);
+cursor:pointer;
+color:white;
+font-family:Arial,sans-serif;
+text-align:center;
 }
-.box{padding:30px 45px;border:1px solid #7898b855;background:#05080dcc;box-shadow:0 0 50px #31507055}
-.box h1{margin:0 0 12px;font-size:28px;letter-spacing:8px}
-.box p{opacity:.65;letter-spacing:3px;font-size:11px}
+
+.box{
+padding:35px 55px;
+background:#090705dd;
+border:1px solid #c7a86a55;
+box-shadow:0 0 80px #000;
+}
+
+.box h1{
+margin:0 0 15px;
+font-size:28px;
+letter-spacing:8px;
+}
+
+.box p{
+font-size:11px;
+letter-spacing:3px;
+opacity:.6;
+}
+
 #cross{
-position:fixed;left:50%;top:50%;width:8px;height:8px;
-transform:translate(-50%,-50%);z-index:9;pointer-events:none
+position:fixed;
+left:50%;
+top:50%;
+width:9px;
+height:9px;
+transform:translate(-50%,-50%);
+z-index:9;
+pointer-events:none;
 }
-#cross:before,#cross:after{content:"";position:absolute;background:#dcecff88}
-#cross:before{width:8px;height:1px;top:3px}
-#cross:after{height:8px;width:1px;left:3px}
+
+#cross:before,#cross:after{
+content:"";
+position:absolute;
+background:#e8d9b988;
+}
+
+#cross:before{width:9px;height:1px;top:4px}
+#cross:after{height:9px;width:1px;left:4px}
 </style>
 </head>
 
@@ -38,7 +93,7 @@ transform:translate(-50%,-50%);z-index:9;pointer-events:none
 
 <div id="hud">
 <div id="title">LIBRARY OF BABEL // AETHER</div>
-<div id="status">INITIALIZING ARCHIVE...</div>
+<div id="status">LOADING ARCHIVE...</div>
 </div>
 
 <div id="cross"></div>
@@ -70,19 +125,42 @@ import {RenderPass} from "three/addons/postprocessing/RenderPass.js";
 import {UnrealBloomPass} from "three/addons/postprocessing/UnrealBloomPass.js";
 import {OutputPass} from "three/addons/postprocessing/OutputPass.js";
 
+
+/* =========================
+   SCENE
+========================= */
+
 const scene=new THREE.Scene();
 
-scene.background=new THREE.Color(0x030405);
-scene.fog=new THREE.FogExp2(0x080b10,0.012);
+scene.background=new THREE.Color(0x050403);
+
+scene.fog=new THREE.FogExp2(
+0x17130f,
+0.008
+);
+
+
+/* =========================
+   CAMERA
+========================= */
 
 const camera=new THREE.PerspectiveCamera(
 72,
 innerWidth/innerHeight,
 0.05,
-500
+300
 );
 
-camera.position.set(42,-48,8);
+camera.position.set(
+0,
+3,
+-30
+);
+
+
+/* =========================
+   RENDERER
+========================= */
 
 const renderer=new THREE.WebGLRenderer({
 antialias:true,
@@ -90,86 +168,257 @@ powerPreference:"high-performance"
 });
 
 renderer.setSize(innerWidth,innerHeight);
-renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
 
-renderer.shadowMap.enabled=true;
-renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.setPixelRatio(
+Math.min(devicePixelRatio,1.5)
+);
 
 renderer.outputColorSpace=THREE.SRGBColorSpace;
+
 renderer.toneMapping=THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure=1.15;
+
+renderer.toneMappingExposure=1.25;
+
+renderer.shadowMap.enabled=true;
+
+renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 
 document.body.appendChild(renderer.domElement);
 
+
+/* =========================
+   CINEMATIC POST
+========================= */
+
 const composer=new EffectComposer(renderer);
 
-const renderPass=new RenderPass(scene,camera);
-composer.addPass(renderPass);
+composer.addPass(
+new RenderPass(scene,camera)
+);
 
 const bloom=new UnrealBloomPass(
 new THREE.Vector2(innerWidth,innerHeight),
-0.22,
-0.65,
+0.16,
+0.55,
 0.88
 );
 
 composer.addPass(bloom);
-composer.addPass(new OutputPass());
 
-/* lighting */
+composer.addPass(
+new OutputPass()
+);
 
-const ambient=new THREE.HemisphereLight(
-0x9db7d8,
+
+/* =========================
+   LIGHTING
+========================= */
+
+const hemi=new THREE.HemisphereLight(
+0xffe8c4,
 0x090604,
-1.15
+1.8
 );
 
-scene.add(ambient);
+scene.add(hemi);
 
-const key=new THREE.DirectionalLight(
-0xffd8a0,
-3.0
+
+const sun=new THREE.DirectionalLight(
+0xffd29a,
+2.2
 );
 
-key.position.set(15,-20,35);
-key.castShadow=true;
+sun.position.set(
+-25,
+45,
+-30
+);
 
-key.shadow.mapSize.set(2048,2048);
-key.shadow.camera.near=1;
-key.shadow.camera.far=150;
+sun.castShadow=true;
 
-key.shadow.camera.left=-70;
-key.shadow.camera.right=70;
-key.shadow.camera.top=70;
-key.shadow.camera.bottom=-70;
+sun.shadow.mapSize.set(
+1024,
+1024
+);
 
-scene.add(key);
+sun.shadow.camera.near=1;
+sun.shadow.camera.far=180;
 
-const fill=new THREE.PointLight(
-0x6f9dff,
-120,
-90,
+sun.shadow.camera.left=-80;
+sun.shadow.camera.right=80;
+sun.shadow.camera.top=80;
+sun.shadow.camera.bottom=-80;
+
+scene.add(sun);
+
+
+/* warm architectural lights */
+
+function addLight(x,y,z,color,intensity,distance){
+
+const l=new THREE.PointLight(
+color,
+intensity,
+distance,
 2
 );
 
-fill.position.set(-20,0,18);
-scene.add(fill);
+l.position.set(x,y,z);
 
-const warm=new THREE.PointLight(
-0xffb35c,
-150,
-110,
-2
-);
+scene.add(l);
 
-warm.position.set(25,-25,12);
-scene.add(warm);
+}
 
-/* GLB */
+
+/* warm pools */
+
+addLight(0,10,-20,0xffa34d,180,55);
+addLight(-20,15,0,0xffb45c,150,50);
+addLight(20,18,5,0xffc477,170,55);
+addLight(0,25,20,0xffc985,200,65);
+
+addLight(-25,8,-25,0x7d96c4,70,45);
+addLight(25,12,-15,0x7d96c4,60,45);
+
+
+/* =========================
+   MATERIAL ENHANCEMENT
+========================= */
+
+function tuneMaterial(m){
+
+if(!m || !m.name) return;
+
+const n=m.name.toLowerCase();
+
+if(!m.color)
+return;
+
+
+/* stone */
+
+if(
+n.includes("stone") ||
+n.includes("carved")
+){
+m.color.set("#776a5a");
+m.roughness=.78;
+m.metalness=0;
+}
+
+
+/* marble */
+
+else if(n.includes("marble")){
+
+m.color.set("#aaa08e");
+m.roughness=.55;
+m.metalness=0;
+}
+
+
+/* gold */
+
+else if(
+n.includes("gold") ||
+n.includes("aged gold")
+){
+
+m.color.set("#b8893e");
+m.roughness=.35;
+m.metalness=.72;
+
+}
+
+
+/* normal wood */
+
+else if(
+n.includes("wood")
+){
+
+m.color.set("#3b2115");
+m.roughness=.82;
+m.metalness=0;
+
+}
+
+
+/* books */
+
+else if(
+n.includes("red books")
+){
+
+m.color.set("#72251e");
+m.roughness=.9;
+m.metalness=0;
+
+}
+
+else if(
+n.includes("blue books")
+){
+
+m.color.set("#263e63");
+m.roughness=.9;
+m.metalness=0;
+
+}
+
+else if(
+n.includes("old books")
+){
+
+m.color.set("#55402b");
+m.roughness=.88;
+m.metalness=0;
+
+}
+
+else if(
+n.includes("book")
+){
+
+m.color.set("#4b3525");
+m.roughness=.88;
+m.metalness=0;
+
+}
+
+
+/* leather */
+
+else if(n.includes("leather")){
+
+m.color.set("#351c13");
+m.roughness=.82;
+m.metalness=0;
+
+}
+
+
+/* iron */
+
+else if(n.includes("iron")){
+
+m.color.set("#242528");
+m.roughness=.55;
+m.metalness=.65;
+
+}
+
+}
+
+
+/* =========================
+   LOAD LIBRARY
+========================= */
 
 const loader=new GLTFLoader();
 
 loader.load(
+
 "babel_library_v10.glb",
 
 (gltf)=>{
@@ -178,161 +427,311 @@ const root=gltf.scene;
 
 scene.add(root);
 
-root.traverse((o)=>{
 
-if(!o.isMesh)return;
+/* DO NOT CENTER OR RESCALE THE BLENDER WORLD */
 
-o.castShadow=true;
-o.receiveShadow=true;
+root.traverse(obj=>{
 
-if(o.material){
+if(!obj.isMesh)
+return;
 
-const materials=Array.isArray(o.material)
-?o.material:[o.material];
+obj.castShadow=false;
+obj.receiveShadow=true;
 
-materials.forEach(m=>{
+if(obj.material){
+
+const mats=Array.isArray(obj.material)
+?obj.material
+:[obj.material];
+
+mats.forEach(m=>{
+
+tuneMaterial(m);
 
 m.needsUpdate=true;
 
-if("roughness" in m)
-m.roughness=Math.max(.32,Math.min(.9,m.roughness));
-
-if("metalness" in m)
-m.metalness=Math.min(.65,m.metalness);
-
 });
 
 }
 
 });
 
-/* fit */
 
-const box=new THREE.Box3().setFromObject(root);
-const center=box.getCenter(new THREE.Vector3());
-const size=box.getSize(new THREE.Vector3());
+/* =========================
+   FIND WORLD SIZE
+========================= */
 
-root.position.sub(center);
+const box=new THREE.Box3()
+.setFromObject(root);
 
-const maxDim=Math.max(size.x,size.y,size.z);
+const center=box.getCenter(
+new THREE.Vector3()
+);
 
-if(maxDim>180){
-root.scale.setScalar(180/maxDim);
+const size=box.getSize(
+new THREE.Vector3()
+);
+
+
+/* =========================
+   PLAYER START
+========================= */
+
+camera.position.set(
+center.x,
+box.min.y+2.2,
+center.z-30
+);
+
+
+/* look into library */
+
+const target=new THREE.Vector3(
+center.x,
+box.min.y+9,
+center.z
+);
+
+camera.lookAt(target);
+
+
+/* =========================
+   MORE LIGHTS AROUND WORLD
+========================= */
+
+for(let i=0;i<7;i++){
+
+const a=(i/7)*Math.PI*2;
+
+const x=center.x+
+Math.cos(a)*22;
+
+const z=center.z+
+Math.sin(a)*22;
+
+addLight(
+x,
+box.min.y+10+(i%3)*7,
+z,
+i%2
+?0xffa95c
+:0xffd08a,
+85,
+38
+);
+
 }
+
 
 document.getElementById("status").textContent=
-"ARCHIVE ONLINE // 615 STRUCTURAL NODES";
+"ARCHIVE ONLINE // V10 // AETHER";
+
 
 },
 
 undefined,
 
-(err)=>{
-console.error(err);
+(error)=>{
+
+console.error(error);
+
 document.getElementById("status").textContent=
 "ARCHIVE LOAD ERROR";
+
+}
+
+);
+
+
+/* =========================
+   CONTROLS
+========================= */
+
+const controls=
+new PointerLockControls(
+camera,
+document.body
+);
+
+document
+.getElementById("start")
+.addEventListener(
+"click",
+()=>{
+controls.lock();
 }
 );
 
-/* controls */
-
-const controls=new PointerLockControls(camera,document.body);
-
-document.getElementById("start").addEventListener(
-"click",
-()=>controls.lock()
+controls.addEventListener(
+"lock",
+()=>{
+document.getElementById("start")
+.style.display="none";
+}
 );
 
-controls.addEventListener("lock",()=>{
-document.getElementById("start").style.display="none";
-});
+controls.addEventListener(
+"unlock",
+()=>{
+document.getElementById("start")
+.style.display="flex";
+}
+);
 
-controls.addEventListener("unlock",()=>{
-document.getElementById("start").style.display="flex";
-});
 
-/* movement */
+/* =========================
+   MOVEMENT
+========================= */
 
 const keys={};
 
-addEventListener("keydown",e=>{
+addEventListener(
+"keydown",
+e=>{
 keys[e.code]=true;
-});
+}
+);
 
-addEventListener("keyup",e=>{
+addEventListener(
+"keyup",
+e=>{
 keys[e.code]=false;
-});
+}
+);
 
 const clock=new THREE.Clock();
 
-function move(dt){
+function movement(dt){
 
-if(!controls.isLocked)return;
+if(!controls.isLocked)
+return;
 
-let speed=keys.ShiftLeft||keys.ShiftRight?15:7;
+const speed=
+(keys.ShiftLeft||keys.ShiftRight)
+?14
+:6;
 
-if(keys.KeyW)controls.moveForward(speed*dt);
-if(keys.KeyS)controls.moveForward(-speed*dt);
-if(keys.KeyA)controls.moveRight(-speed*dt);
-if(keys.KeyD)controls.moveRight(speed*dt);
+if(keys.KeyW)
+controls.moveForward(speed*dt);
 
-/* keep player above floor */
+if(keys.KeyS)
+controls.moveForward(-speed*dt);
 
-if(camera.position.y<2.2)
-camera.position.y=2.2;
+if(keys.KeyA)
+controls.moveRight(-speed*dt);
 
-}
+if(keys.KeyD)
+controls.moveRight(speed*dt);
 
-/* dust */
 
-const dustGeo=new THREE.BufferGeometry();
-const dustCount=1800;
-const pos=new Float32Array(dustCount*3);
+/* player height */
 
-for(let i=0;i<dustCount;i++){
-
-pos[i*3]=(Math.random()-.5)*150;
-pos[i*3+1]=Math.random()*70;
-pos[i*3+2]=(Math.random()-.5)*150;
+if(camera.position.y<1.8)
+camera.position.y=1.8;
 
 }
 
-dustGeo.setAttribute(
+
+/* =========================
+   DUST
+========================= */
+
+const dustGeometry=
+new THREE.BufferGeometry();
+
+const count=900;
+
+const positions=
+new Float32Array(count*3);
+
+for(let i=0;i<count;i++){
+
+positions[i*3]=
+(Math.random()-.5)*100;
+
+positions[i*3+1]=
+Math.random()*45;
+
+positions[i*3+2]=
+(Math.random()-.5)*100;
+
+}
+
+dustGeometry.setAttribute(
 "position",
-new THREE.BufferAttribute(pos,3)
+new THREE.BufferAttribute(
+positions,
+3
+)
 );
 
-const dustMat=new THREE.PointsMaterial({
-color:0xb9c7d8,
-size:.035,
+const dustMaterial=
+new THREE.PointsMaterial({
+
+color:0xd8c6a8,
+
+size:.025,
+
 transparent:true,
-opacity:.25,
+
+opacity:.16,
+
 depthWrite:false
+
 });
 
-scene.add(new THREE.Points(dustGeo,dustMat));
+scene.add(
+new THREE.Points(
+dustGeometry,
+dustMaterial
+)
+);
 
-/* resize */
 
-addEventListener("resize",()=>{
+/* =========================
+   RESIZE
+========================= */
 
-camera.aspect=innerWidth/innerHeight;
+addEventListener(
+"resize",
+()=>{
+
+camera.aspect=
+innerWidth/innerHeight;
+
 camera.updateProjectionMatrix();
 
-renderer.setSize(innerWidth,innerHeight);
-composer.setSize(innerWidth,innerHeight);
+renderer.setSize(
+innerWidth,
+innerHeight
+);
 
-});
+composer.setSize(
+innerWidth,
+innerHeight
+);
 
-/* loop */
+}
+);
+
+
+/* =========================
+   LOOP
+========================= */
 
 function animate(){
 
-requestAnimationFrame(animate);
+requestAnimationFrame(
+animate
+);
 
-const dt=Math.min(clock.getDelta(),.05);
+const dt=
+Math.min(
+clock.getDelta(),
+.05
+);
 
-move(dt);
+movement(dt);
 
 composer.render();
 
@@ -341,5 +740,6 @@ composer.render();
 animate();
 
 </script>
+
 </body>
 </html>
