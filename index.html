@@ -153,7 +153,7 @@ scene.background = new THREE.Color(0x050403);
 
 scene.fog = new THREE.FogExp2(
     0x17130f,
-    0.007
+    0.008
 );
 
 
@@ -165,7 +165,13 @@ const camera = new THREE.PerspectiveCamera(
     72,
     innerWidth / innerHeight,
     0.05,
-    350
+    300
+);
+
+camera.position.set(
+    0,
+    3,
+    -30
 );
 
 
@@ -193,7 +199,7 @@ renderer.outputColorSpace =
 renderer.toneMapping =
     THREE.ACESFilmicToneMapping;
 
-renderer.toneMappingExposure = 1.18;
+renderer.toneMappingExposure = 1.25;
 
 renderer.shadowMap.enabled = true;
 
@@ -222,9 +228,9 @@ const bloom =
             innerWidth,
             innerHeight
         ),
-        0.14,
+        0.16,
         0.55,
-        0.9
+        0.88
     );
 
 composer.addPass(bloom);
@@ -242,7 +248,7 @@ const hemi =
     new THREE.HemisphereLight(
         0xffe8c4,
         0x090604,
-        1.65
+        1.8
     );
 
 scene.add(hemi);
@@ -250,8 +256,8 @@ scene.add(hemi);
 
 const sun =
     new THREE.DirectionalLight(
-        0xffd09a,
-        2.0
+        0xffd29a,
+        2.2
     );
 
 sun.position.set(
@@ -307,53 +313,51 @@ function addLight(
 }
 
 
-/* Main architectural lights */
-
 addLight(
     0,10,-20,
     0xffa34d,
-    150,
+    180,
     55
 );
 
 addLight(
     -20,15,0,
     0xffb45c,
-    130,
+    150,
     50
 );
 
 addLight(
     20,18,5,
     0xffc477,
-    150,
+    170,
     55
 );
 
 addLight(
     0,25,20,
     0xffc985,
-    170,
+    200,
     65
 );
 
 addLight(
     -25,8,-25,
     0x7d96c4,
-    60,
+    70,
     45
 );
 
 addLight(
     25,12,-15,
     0x7d96c4,
-    55,
+    60,
     45
 );
 
 
 /* =========================================================
-   MATERIAL TUNING
+   MATERIALS
 ========================================================= */
 
 function tuneMaterial(m){
@@ -368,137 +372,93 @@ function tuneMaterial(m){
         return;
 
 
-    /* STONE */
-
     if(
         n.includes("stone") ||
         n.includes("carved")
     ){
 
         m.color.set("#776a5a");
-
         m.roughness = .78;
-
         m.metalness = 0;
     }
-
-
-    /* MARBLE */
 
     else if(
         n.includes("marble")
     ){
 
         m.color.set("#aaa08e");
-
         m.roughness = .55;
-
         m.metalness = 0;
     }
-
-
-    /* GOLD */
 
     else if(
         n.includes("gold")
     ){
 
         m.color.set("#b8893e");
-
-        m.roughness = .34;
-
+        m.roughness = .35;
         m.metalness = .72;
     }
-
-
-    /* WOOD */
 
     else if(
         n.includes("wood")
     ){
 
         m.color.set("#3b2115");
-
         m.roughness = .82;
-
         m.metalness = 0;
     }
-
-
-    /* RED BOOKS */
 
     else if(
         n.includes("red books")
     ){
 
         m.color.set("#72251e");
-
         m.roughness = .9;
-
         m.metalness = 0;
     }
-
-
-    /* BLUE BOOKS */
 
     else if(
         n.includes("blue books")
     ){
 
         m.color.set("#263e63");
-
         m.roughness = .9;
-
         m.metalness = 0;
     }
-
-
-    /* OLD BOOKS */
 
     else if(
         n.includes("old books")
     ){
 
         m.color.set("#55402b");
-
         m.roughness = .88;
-
         m.metalness = 0;
     }
-
-
-    /* BOOKS */
 
     else if(
         n.includes("book")
     ){
 
         m.color.set("#4b3525");
-
         m.roughness = .88;
-
         m.metalness = 0;
     }
-
-
-    /* IRON */
 
     else if(
         n.includes("iron")
     ){
 
         m.color.set("#242528");
-
         m.roughness = .55;
-
-        m.metalness = .6;
+        m.metalness = .65;
     }
 
 }
 
 
 /* =========================================================
-   LIBRARY LOADING
+   LOAD V10 LIBRARY
 ========================================================= */
 
 const loader =
@@ -506,27 +466,20 @@ const loader =
 
 let library = null;
 
-let worldBox = null;
-
-let worldCenter = null;
-
-let worldFloor = 0;
-
-
 loader.load(
 
     "babel_library_v10.glb",
 
     (gltf)=>{
 
-        library = gltf.scene;
+        const root = gltf.scene;
 
-        scene.add(library);
+        library = root;
+
+        scene.add(root);
 
 
-        /* Material + mesh setup */
-
-        library.traverse(
+        root.traverse(
             obj=>{
 
                 if(!obj.isMesh)
@@ -540,22 +493,17 @@ loader.load(
                 if(obj.material){
 
                     const materials =
-                        Array.isArray(
-                            obj.material
-                        )
+                        Array.isArray(obj.material)
                         ? obj.material
                         : [obj.material];
 
 
                     materials.forEach(
-                        material=>{
+                        m=>{
 
-                            tuneMaterial(
-                                material
-                            );
+                            tuneMaterial(m);
 
-                            material.needsUpdate =
-                                true;
+                            m.needsUpdate = true;
 
                         }
                     );
@@ -566,50 +514,45 @@ loader.load(
         );
 
 
-        /* Calculate actual Blender bounds */
+        /*
+           IMPORTANT:
+           Keep the Blender world exactly
+           where it was exported.
+        */
 
-        worldBox =
+        const box =
             new THREE.Box3()
-            .setFromObject(
-                library
-            );
+            .setFromObject(root);
 
-        worldCenter =
-            worldBox.getCenter(
+        const center =
+            box.getCenter(
                 new THREE.Vector3()
             );
 
-        worldFloor =
-            worldBox.min.y;
 
-
-        /* Spawn near front-center */
+        /*
+           Same basic camera idea as
+           the version that looked good.
+        */
 
         camera.position.set(
-
-            worldCenter.x,
-
-            worldFloor + 3,
-
-            worldCenter.z - 25
-
+            center.x,
+            box.min.y + 3,
+            center.z - 30
         );
 
-
-        /* Look toward library */
 
         camera.lookAt(
-
-            worldCenter.x,
-
-            worldFloor + 8,
-
-            worldCenter.z
-
+            center.x,
+            box.min.y + 9,
+            center.z
         );
 
 
-        /* Extra lights based on actual world */
+        /*
+           Additional lights around
+           the actual library.
+        */
 
         for(
             let i=0;
@@ -621,32 +564,25 @@ loader.load(
                 (i/8) *
                 Math.PI * 2;
 
-            const radius = 24;
+            const radius = 22;
 
             const x =
-                worldCenter.x +
+                center.x +
                 Math.cos(angle)*radius;
 
             const z =
-                worldCenter.z +
+                center.z +
                 Math.sin(angle)*radius;
 
             addLight(
-
                 x,
-
-                worldFloor +
-                9 +
+                box.min.y + 10 +
                 (i%3)*6,
-
                 z,
-
                 i%2
-                ?0xffa95c
-                :0xffd08a,
-
+                    ? 0xffa95c
+                    : 0xffd08a,
                 65,
-
                 38
             );
 
@@ -664,10 +600,7 @@ loader.load(
 
     error=>{
 
-        console.error(
-            "GLB ERROR:",
-            error
-        );
+        console.error(error);
 
         document
         .getElementById("status")
@@ -727,7 +660,7 @@ controls.addEventListener(
 
 
 /* =========================================================
-   PLAYER
+   PLAYER PHYSICS
 ========================================================= */
 
 const keys = {};
@@ -736,17 +669,54 @@ let velocityY = 0;
 
 let grounded = false;
 
-const gravity = 28;
+const GRAVITY = 28;
 
-const jumpPower = 10;
+const JUMP_POWER = 10;
 
-const playerHeight = 1.8;
-
-const maxStepHeight = 1.0;
+const PLAYER_HEIGHT = 1.8;
 
 
 /* =========================================================
-   RAYCASTING
+   INPUT
+========================================================= */
+
+addEventListener(
+    "keydown",
+    e=>{
+
+        keys[e.code] = true;
+
+
+        /* SPACE = JUMP */
+
+        if(
+            e.code === "Space" &&
+            grounded
+        ){
+
+            velocityY =
+                JUMP_POWER;
+
+            grounded = false;
+
+        }
+
+    }
+);
+
+
+addEventListener(
+    "keyup",
+    e=>{
+
+        keys[e.code] = false;
+
+    }
+);
+
+
+/* =========================================================
+   FLOOR RAYCAST
 ========================================================= */
 
 const floorRay =
@@ -760,28 +730,23 @@ const down =
     );
 
 
-function getFloorHeight(){
+function getFloor(){
 
     if(!library)
         return null;
 
 
     /*
-       Start slightly above player.
-       Look downward through stairs,
-       floors and platforms.
+       Start above the player's head
+       and shoot straight down.
     */
 
-    const origin =
+    floorRay.set(
         new THREE.Vector3(
             camera.position.x,
-            camera.position.y + .7,
+            camera.position.y + 1.0,
             camera.position.z
-        );
-
-
-    floorRay.set(
-        origin,
+        ),
         down
     );
 
@@ -793,63 +758,16 @@ function getFloorHeight(){
         );
 
 
-    for(
-        const hit of hits
-    ){
-
-        if(
-            hit.object &&
-            hit.object.isMesh
-        ){
-
-            return hit.point.y;
-
-        }
-
-    }
+    if(!hits.length)
+        return null;
 
 
-    return null;
+    /*
+       First surface underneath us.
+    */
+
+    return hits[0].point.y;
 }
-
-
-/* =========================================================
-   INPUT
-========================================================= */
-
-addEventListener(
-    "keydown",
-    event=>{
-
-        keys[event.code] = true;
-
-
-        /* JUMP */
-
-        if(
-            event.code === "Space" &&
-            grounded
-        ){
-
-            velocityY =
-                jumpPower;
-
-            grounded = false;
-
-        }
-
-    }
-);
-
-
-addEventListener(
-    "keyup",
-    event=>{
-
-        keys[event.code] = false;
-
-    }
-);
 
 
 /* =========================================================
@@ -858,9 +776,7 @@ addEventListener(
 
 function movement(dt){
 
-    if(
-        !controls.isLocked
-    )
+    if(!controls.isLocked)
         return;
 
 
@@ -869,43 +785,28 @@ function movement(dt){
             keys.ShiftLeft ||
             keys.ShiftRight
         )
-        ?14
-        :6;
+        ? 14
+        : 6;
 
 
     /*
-       Remember floor before moving.
+       NORMAL WASD
     */
-
-    const oldFloor =
-        getFloorHeight();
-
-
-    const oldY =
-        camera.position.y;
-
-
-    /* ======================
-       HORIZONTAL
-    ====================== */
 
     if(keys.KeyW)
         controls.moveForward(
             speed * dt
         );
 
-
     if(keys.KeyS)
         controls.moveForward(
             -speed * dt
         );
 
-
     if(keys.KeyA)
         controls.moveRight(
             -speed * dt
         );
-
 
     if(keys.KeyD)
         controls.moveRight(
@@ -914,88 +815,49 @@ function movement(dt){
 
 
     /*
-       Find surface after movement.
-       This is what lets the player
-       climb individual stairs.
+       GRAVITY
     */
 
-    const newFloor =
-        getFloorHeight();
-
-
-    if(
-        oldFloor !== null &&
-        newFloor !== null
-    ){
-
-        const difference =
-            newFloor - oldFloor;
-
-
-        /*
-           STEP UP
-
-           If the next surface is
-           higher but not too high,
-           smoothly place player on it.
-        */
-
-        if(
-            difference > 0 &&
-            difference <= maxStepHeight &&
-            velocityY <= 0
-        ){
-
-            camera.position.y =
-                newFloor +
-                playerHeight;
-
-            velocityY = 0;
-
-            grounded = true;
-
-        }
-
-    }
-
-
-    /* ======================
-       GRAVITY
-    ====================== */
-
     velocityY -=
-        gravity * dt;
-
+        GRAVITY * dt;
 
     camera.position.y +=
         velocityY * dt;
 
 
     /*
-       Current floor after
-       movement + vertical motion.
+       FIND FLOOR / STAIR
     */
 
     const floor =
-        getFloorHeight();
+        getFloor();
 
 
-    if(
-        floor !== null
-    ){
+    if(floor !== null){
 
         const targetY =
             floor +
-            playerHeight;
+            PLAYER_HEIGHT;
+
+        const difference =
+            camera.position.y -
+            targetY;
 
 
         /*
-           Land on floor/stair.
+           NORMAL FLOOR / STAIRS
+
+           If the surface is within
+           ~1.1m beneath us, step onto it.
+
+           This is what lets us walk
+           up individual stair steps.
         */
 
         if(
-            camera.position.y <=
-            targetY
+            difference >= 0 &&
+            difference <= 1.1 &&
+            velocityY <= 0
         ){
 
             camera.position.y =
@@ -1007,32 +869,65 @@ function movement(dt){
 
         }
 
+
+        /*
+           LANDING AFTER JUMP
+        */
+
+        else if(
+            camera.position.y <=
+            targetY + 0.15 &&
+            velocityY <= 0
+        ){
+
+            camera.position.y =
+                targetY;
+
+            velocityY = 0;
+
+            grounded = true;
+
+        }
+
+        else{
+
+            grounded = false;
+
+        }
+
     }
 
 
     /*
-       Prevent falling forever
-       outside the building.
+       Safety reset.
     */
 
     if(
-        camera.position.y <
-        worldFloor - 10
+        camera.position.y < -20
     ){
 
-        camera.position.set(
+        if(library){
 
-            worldCenter.x,
+            const box =
+                new THREE.Box3()
+                .setFromObject(
+                    library
+                );
 
-            worldFloor + 3,
+            const center =
+                box.getCenter(
+                    new THREE.Vector3()
+                );
 
-            worldCenter.z - 25
+            camera.position.set(
+                center.x,
+                box.min.y + 3,
+                center.z - 30
+            );
 
-        );
+        }
 
         velocityY = 0;
-
-        grounded = false;
 
     }
 
@@ -1046,7 +941,7 @@ function movement(dt){
 const dustGeometry =
     new THREE.BufferGeometry();
 
-const dustCount = 800;
+const dustCount = 900;
 
 const dustPositions =
     new Float32Array(
@@ -1061,13 +956,13 @@ for(
 ){
 
     dustPositions[i*3] =
-        (Math.random()-.5)*110;
+        (Math.random()-.5)*100;
 
     dustPositions[i*3+1] =
-        Math.random()*50;
+        Math.random()*45;
 
     dustPositions[i*3+2] =
-        (Math.random()-.5)*110;
+        (Math.random()-.5)*100;
 
 }
 
@@ -1090,7 +985,7 @@ const dustMaterial =
 
         transparent:true,
 
-        opacity:.14,
+        opacity:.16,
 
         depthWrite:false
 
@@ -1119,12 +1014,10 @@ addEventListener(
 
         camera.updateProjectionMatrix();
 
-
         renderer.setSize(
             innerWidth,
             innerHeight
         );
-
 
         composer.setSize(
             innerWidth,
@@ -1149,16 +1042,13 @@ function animate(){
         animate
     );
 
-
     const dt =
         Math.min(
             clock.getDelta(),
-            .05
+            0.05
         );
 
-
     movement(dt);
-
 
     composer.render();
 
