@@ -417,6 +417,7 @@ m.metalness=.65;
 
 const loader=new GLTFLoader();
 
+let world=null;    
 loader.load(
 
 "babel_library_v10.glb",
@@ -424,6 +425,7 @@ loader.load(
 (gltf)=>{
 
 const root=gltf.scene;
+world=root;
 
 scene.add(root);
 
@@ -580,57 +582,124 @@ document.getElementById("start")
 
 
 /* =========================
-   MOVEMENT
+   MOVEMENT + JUMP + STAIRS
 ========================= */
 
 const keys={};
+let velocityY=0;
+let grounded=false;
 
-addEventListener(
-"keydown",
-e=>{
-keys[e.code]=true;
+const gravity=28;
+const jumpPower=10;
+const playerHeight=1.8;
+const stepHeight=0.75;
+
+const raycaster=new THREE.Raycaster();
+const downDirection=new THREE.Vector3(0,-1,0);
+
+addEventListener("keydown",e=>{
+    keys[e.code]=true;
+
+    if(
+        e.code==="Space" &&
+        grounded
+    ){
+        velocityY=jumpPower;
+        grounded=false;
+    }
+});
+
+addEventListener("keyup",e=>{
+    keys[e.code]=false;
+});
+
+function getFloorY(){
+
+    raycaster.set(
+        camera.position,
+        downDirection
+    );
+
+    const hits=raycaster.intersectObjects(
+        scene.children,
+        true
+    );
+
+    for(const hit of hits){
+
+        if(
+            hit.object.isMesh &&
+            hit.point.y <= camera.position.y + 2
+        ){
+            return hit.point.y;
+        }
+    }
+
+    return null;
 }
-);
-
-addEventListener(
-"keyup",
-e=>{
-keys[e.code]=false;
-}
-);
-
-const clock=new THREE.Clock();
 
 function movement(dt){
 
-if(!controls.isLocked)
-return;
+    if(!controls.isLocked)
+        return;
 
-const speed=
-(keys.ShiftLeft||keys.ShiftRight)
-?14
-:6;
+    const speed=
+        (keys.ShiftLeft||keys.ShiftRight)
+        ?14
+        :6;
 
-if(keys.KeyW)
-controls.moveForward(speed*dt);
+    /* horizontal movement */
 
-if(keys.KeyS)
-controls.moveForward(-speed*dt);
+    if(keys.KeyW)
+        controls.moveForward(speed*dt);
 
-if(keys.KeyA)
-controls.moveRight(-speed*dt);
+    if(keys.KeyS)
+        controls.moveForward(-speed*dt);
 
-if(keys.KeyD)
-controls.moveRight(speed*dt);
+    if(keys.KeyA)
+        controls.moveRight(-speed*dt);
+
+    if(keys.KeyD)
+        controls.moveRight(speed*dt);
 
 
-/* player height */
+    /* gravity */
 
-if(camera.position.y<1.8)
-camera.position.y=1.8;
+    velocityY-=gravity*dt;
+
+    camera.position.y+=velocityY*dt;
+
+
+    /* floor detection */
+
+    const floor=getFloorY();
+
+    if(floor!==null){
+
+        const targetY=floor+playerHeight;
+
+        if(camera.position.y<=targetY){
+
+            camera.position.y=targetY;
+            velocityY=0;
+            grounded=true;
+
+        }
+
+    }
+
+
+    /* don't fall forever */
+
+    if(camera.position.y<0){
+
+        camera.position.y=playerHeight;
+        velocityY=0;
+        grounded=true;
+
+    }
 
 }
-
 
 /* =========================
    DUST
