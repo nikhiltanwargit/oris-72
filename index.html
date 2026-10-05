@@ -1,58 +1,67 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>AETHER // Library of Babel</title>
+<title>LIBRARY OF BABEL</title>
+
 <style>
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#020305;color:#e8faff;font-family:Inter,Segoe UI,system-ui,sans-serif}
-body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:19;background:radial-gradient(ellipse at center,transparent 45%,rgba(0,0,0,.62) 100%),linear-gradient(180deg,rgba(255,170,80,.025),transparent 30%,rgba(0,180,255,.025));mix-blend-mode:screen}
-body:after{content:"";position:fixed;inset:0;pointer-events:none;z-index:20;background:linear-gradient(rgba(105,244,255,.014) 1px,transparent 1px);background-size:100% 4px}
-#world{position:fixed;inset:0;width:100%;height:100%}
-#hud{position:fixed;inset:0;pointer-events:none;z-index:10}
-.panel{background:rgba(2,8,12,.70);border:1px solid rgba(105,244,255,.20);box-shadow:0 0 30px rgba(0,180,255,.05);backdrop-filter:blur(7px)}
-.top{position:absolute;left:18px;right:18px;top:16px;height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 16px}
-.brand{font-weight:900;letter-spacing:.32em;font-size:13px}.sub{font:8px ui-monospace,monospace;color:#6d8d95;letter-spacing:.15em;margin-top:4px}
-.status{font:8px ui-monospace,monospace;color:#65ffc0;letter-spacing:.15em}.dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#65ffc0;box-shadow:0 0 12px #65ffc0;margin-right:7px}
-.left{position:absolute;left:18px;bottom:18px;width:260px;padding:14px}.label{font:8px ui-monospace,monospace;color:#66838d;letter-spacing:.18em}.row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(105,244,255,.08);font:8px ui-monospace,monospace}.good{color:#65ffc0}
-.cross{position:absolute;left:50%;top:50%;width:18px;height:18px;transform:translate(-50%,-50%);opacity:.7}.cross:before,.cross:after{content:"";position:absolute;background:#69f4ff;box-shadow:0 0 8px #69f4ff}.cross:before{width:18px;height:1px;top:8px}.cross:after{width:1px;height:18px;left:8px}
-.bottom{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);font:8px ui-monospace,monospace;color:#8aabb2;letter-spacing:.14em;text-align:center;text-shadow:0 0 8px #000}
-#boot{position:fixed;inset:0;z-index:30;background:radial-gradient(circle at center,rgba(20,62,72,.25),#020305 65%);display:grid;place-items:center}
-.bootbox{width:min(560px,calc(100vw - 36px));padding:28px;text-align:center}.bootbox h1{margin:0;color:#e8faff;letter-spacing:.28em;font-size:22px}.bootbox p{color:#66838d;font:9px/1.8 ui-monospace,monospace;letter-spacing:.08em}
-.btn{border:1px solid #69f4ff;background:rgba(105,244,255,.06);color:#69f4ff;padding:12px 18px;cursor:pointer;font:9px ui-monospace,monospace;letter-spacing:.16em}.btn:hover{background:rgba(105,244,255,.14);box-shadow:0 0 20px rgba(105,244,255,.12)}
-#file{display:none}
-#command{position:absolute;right:18px;bottom:18px;width:310px;display:none;padding:10px;pointer-events:auto}.cmdline{display:flex;gap:6px}.cmdline input{flex:1;min-width:0;background:#02080c;border:1px solid rgba(105,244,255,.18);color:#d9fbff;padding:9px;outline:none;font:9px ui-monospace,monospace}.cmdline button{border:1px solid #69f4ff;background:transparent;color:#69f4ff;padding:0 10px;font:8px ui-monospace,monospace}.hint{font:7px ui-monospace,monospace;color:#52727b;margin-top:7px}
-#cinema{position:fixed;inset:0;z-index:8;pointer-events:none;background:linear-gradient(180deg,rgba(0,0,0,.25),transparent 24%,transparent 76%,rgba(0,0,0,.34));}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#030405;font-family:Arial,sans-serif}
+canvas{display:block}
+#hud{
+position:fixed;top:20px;left:20px;z-index:10;
+color:#d8e8ff;font-size:12px;letter-spacing:2px;
+text-shadow:0 0 12px #6aa9ff;pointer-events:none
+}
+#title{font-size:18px;font-weight:bold}
+#status{margin-top:8px;opacity:.65}
+#start{
+position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+z-index:20;background:radial-gradient(circle,#18202b55,#000 75%);
+color:white;cursor:pointer;text-align:center
+}
+.box{padding:30px 45px;border:1px solid #7898b855;background:#05080dcc;box-shadow:0 0 50px #31507055}
+.box h1{margin:0 0 12px;font-size:28px;letter-spacing:8px}
+.box p{opacity:.65;letter-spacing:3px;font-size:11px}
+#cross{
+position:fixed;left:50%;top:50%;width:8px;height:8px;
+transform:translate(-50%,-50%);z-index:9;pointer-events:none
+}
+#cross:before,#cross:after{content:"";position:absolute;background:#dcecff88}
+#cross:before{width:8px;height:1px;top:3px}
+#cross:after{height:8px;width:1px;left:3px}
 </style>
 </head>
-<body>
-<canvas id="world"></canvas><div id="cinema"></div>
 
-<div id="boot"><div class="bootbox panel">
-<h1>AETHER // BABEL</h1>
-<p>THREE-DIMENSIONAL LIBRARY SIMULATION<br>LOAD YOUR BLENDER WORLD TO INITIALIZE THE ENVIRONMENT.</p>
-<input id="file" type="file" accept=".glb,.gltf">
-<button class="btn" id="load">LOAD BLENDER WORLD</button>
-<p id="bootmsg">LOCAL FILES STAY IN YOUR BROWSER.</p>
-</div></div>
+<body>
 
 <div id="hud">
-<div class="top panel"><div><div class="brand">AETHER</div><div class="sub">COGNITIVE EXPLORATION ENVIRONMENT // BABEL-01</div></div><div class="status"><span class="dot"></span><span id="state">WORLD STANDBY</span></div></div>
-<div class="cross"></div>
-<div class="left panel"><div class="label">EXPLORATION TELEMETRY</div>
-<div class="row"><span>POSITION</span><span id="pos">0 / 0 / 0</span></div>
-<div class="row"><span>FPS</span><span id="fps" class="good">--</span></div>
-<div class="row"><span>WORLD</span><span id="objects">--</span></div>
-<div class="row"><span>MODE</span><span class="good">FIRST PERSON</span></div></div>
-<div class="bottom">CLICK WORLD TO ENTER // WASD MOVE // MOUSE LOOK // SHIFT SPRINT // ESC RELEASE</div>
-<div id="command" class="panel"><div class="cmdline"><input id="cmd" placeholder="AETHER command…"><button id="exec">EXEC</button></div><div class="hint" id="reply">Local command layer online.</div></div>
+<div id="title">LIBRARY OF BABEL // AETHER</div>
+<div id="status">INITIALIZING ARCHIVE...</div>
+</div>
+
+<div id="cross"></div>
+
+<div id="start">
+<div class="box">
+<h1>LIBRARY OF BABEL</h1>
+<p>CLICK TO ENTER</p>
+<p>WASD · MOUSE · SHIFT TO SPRINT · ESC TO RELEASE</p>
+</div>
 </div>
 
 <script type="importmap">
-{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"}}
+{
+"imports":{
+"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+"three/addons/":"https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
+}
+}
 </script>
 
 <script type="module">
+
 import * as THREE from "three";
 import {GLTFLoader} from "three/addons/loaders/GLTFLoader.js";
 import {PointerLockControls} from "three/addons/controls/PointerLockControls.js";
@@ -61,163 +70,276 @@ import {RenderPass} from "three/addons/postprocessing/RenderPass.js";
 import {UnrealBloomPass} from "three/addons/postprocessing/UnrealBloomPass.js";
 import {OutputPass} from "three/addons/postprocessing/OutputPass.js";
 
-const canvas=document.getElementById("world");
-const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
-renderer.setPixelRatio(Math.min(devicePixelRatio,1.75));
+const scene=new THREE.Scene();
+
+scene.background=new THREE.Color(0x030405);
+scene.fog=new THREE.FogExp2(0x080b10,0.012);
+
+const camera=new THREE.PerspectiveCamera(
+72,
+innerWidth/innerHeight,
+0.05,
+500
+);
+
+camera.position.set(42,-48,8);
+
+const renderer=new THREE.WebGLRenderer({
+antialias:true,
+powerPreference:"high-performance"
+});
+
 renderer.setSize(innerWidth,innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
+
 renderer.shadowMap.enabled=true;
 renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+
 renderer.outputColorSpace=THREE.SRGBColorSpace;
 renderer.toneMapping=THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure=.78;
+renderer.toneMappingExposure=1.15;
 
-const scene=new THREE.Scene();
-scene.background=new THREE.Color(0x030506);
-scene.fog=new THREE.FogExp2(0x0b1215,.006);
-
-const camera=new THREE.PerspectiveCamera(70,innerWidth/innerHeight,.05,1600);
-const controls=new PointerLockControls(camera,document.body);
-controls.pointerSpeed=.62;
+document.body.appendChild(renderer.domElement);
 
 const composer=new EffectComposer(renderer);
-composer.setPixelRatio(Math.min(devicePixelRatio,1.5));
-composer.addPass(new RenderPass(scene,camera));
-const bloom=new UnrealBloomPass(new THREE.Vector2(innerWidth,innerHeight),.22,.55,.82);
+
+const renderPass=new RenderPass(scene,camera);
+composer.addPass(renderPass);
+
+const bloom=new UnrealBloomPass(
+new THREE.Vector2(innerWidth,innerHeight),
+0.22,
+0.65,
+0.88
+);
+
 composer.addPass(bloom);
 composer.addPass(new OutputPass());
 
-/* cinematic lighting */
-scene.add(new THREE.HemisphereLight(0xb8d8dc,0x080604,.72));
+/* lighting */
 
-const key=new THREE.DirectionalLight(0xffe2bd,3.2);
-key.position.set(-35,55,18);key.castShadow=true;key.shadow.mapSize.set(2048,2048);
-key.shadow.camera.near=1;key.shadow.camera.far=180;
+const ambient=new THREE.HemisphereLight(
+0x9db7d8,
+0x090604,
+1.15
+);
+
+scene.add(ambient);
+
+const key=new THREE.DirectionalLight(
+0xffd8a0,
+3.0
+);
+
+key.position.set(15,-20,35);
+key.castShadow=true;
+
+key.shadow.mapSize.set(2048,2048);
+key.shadow.camera.near=1;
+key.shadow.camera.far=150;
+
+key.shadow.camera.left=-70;
+key.shadow.camera.right=70;
+key.shadow.camera.top=70;
+key.shadow.camera.bottom=-70;
+
 scene.add(key);
 
-const cool=new THREE.DirectionalLight(0x79dfff,1.8);
-cool.position.set(35,25,-30);scene.add(cool);
+const fill=new THREE.PointLight(
+0x6f9dff,
+120,
+90,
+2
+);
 
-const warm=new THREE.PointLight(0xff8a3d,950,95,2);
-warm.position.set(0,14,0);scene.add(warm);
+fill.position.set(-20,0,18);
+scene.add(fill);
 
-const cyan=new THREE.PointLight(0x45dfff,700,80,2);
-cyan.position.set(-28,9,12);scene.add(cyan);
+const warm=new THREE.PointLight(
+0xffb35c,
+150,
+110,
+2
+);
 
-const grid=new THREE.GridHelper(300,120,0x123a42,0x082126);
-grid.material.transparent=true;grid.material.opacity=.07;scene.add(grid);
+warm.position.set(25,-25,12);
+scene.add(warm);
 
-let world=null,mixer=null,keys={},last=performance.now(),frames=0,fps=0;
-const downRay=new THREE.Raycaster(),blockers=[];
+/* GLB */
 
-function setState(t){document.getElementById("state").textContent=t}
+const loader=new GLTFLoader();
 
-function beautifyMaterial(m){
-  if(!m||!m.isMaterial)return;
-  m.side=THREE.FrontSide;
-  if("roughness" in m)m.roughness=Math.max(.24,Math.min(.82,m.roughness));
-  if("metalness" in m)m.metalness=Math.min(.18,m.metalness);
-  if("envMapIntensity" in m)m.envMapIntensity=1.25;
-  if(m.map){m.map.colorSpace=THREE.SRGBColorSpace;m.map.anisotropy=renderer.capabilities.getMaxAnisotropy()}
+loader.load(
+"babel_library_v10.glb",
+
+(gltf)=>{
+
+const root=gltf.scene;
+
+scene.add(root);
+
+root.traverse((o)=>{
+
+if(!o.isMesh)return;
+
+o.castShadow=true;
+o.receiveShadow=true;
+
+if(o.material){
+
+const materials=Array.isArray(o.material)
+?o.material:[o.material];
+
+materials.forEach(m=>{
+
+m.needsUpdate=true;
+
+if("roughness" in m)
+m.roughness=Math.max(.32,Math.min(.9,m.roughness));
+
+if("metalness" in m)
+m.metalness=Math.min(.65,m.metalness);
+
+});
+
 }
 
-function addArchitecturalGlow(box){
-  const size=box.getSize(new THREE.Vector3()), center=box.getCenter(new THREE.Vector3());
-  const scale=Math.max(size.x,size.z);
-  scene.fog.density=Math.max(.0025,Math.min(.008,5/(scale*5)));
-  warm.distance=Math.max(55,scale*.65);
-  cyan.distance=Math.max(50,scale*.55);
+});
+
+/* fit */
+
+const box=new THREE.Box3().setFromObject(root);
+const center=box.getCenter(new THREE.Vector3());
+const size=box.getSize(new THREE.Vector3());
+
+root.position.sub(center);
+
+const maxDim=Math.max(size.x,size.y,size.z);
+
+if(maxDim>180){
+root.scale.setScalar(180/maxDim);
 }
 
-function loadWorld(file){
-  const url=URL.createObjectURL(file);setState("LOADING WORLD");
-  new GLTFLoader().load(url,g=>{
-    if(world)scene.remove(world);
-    world=g.scene;blockers.length=0;
-    world.traverse(o=>{
-      if(!o.isMesh)return;
-      o.castShadow=true;o.receiveShadow=true;beautifyMaterial(o.material);
-      if(Array.isArray(o.material))o.material.forEach(beautifyMaterial);
-      blockers.push(o);
-    });
-    scene.add(world);
-    if(g.animations.length){mixer=new THREE.AnimationMixer(world);g.animations.forEach(a=>mixer.clipAction(a).play())}
+document.getElementById("status").textContent=
+"ARCHIVE ONLINE // 615 STRUCTURAL NODES";
 
-    const box=new THREE.Box3().setFromObject(world);
-    const center=box.getCenter(new THREE.Vector3()),size=box.getSize(new THREE.Vector3());
-    addArchitecturalGlow(box);
+},
 
-    /* start in the middle, high enough to see the architecture */
-    const spawnRadius=Math.min(Math.max(size.x,size.z)*.12,18);
-    camera.position.set(center.x,box.min.y+Math.max(3.2,size.y*.10),center.z+spawnRadius);
-    camera.lookAt(center.x,center.y,center.z);
-    grid.position.y=box.min.y;
+undefined,
 
-    /* subtle world-space dust */
-    const dustGeo=new THREE.BufferGeometry(),count=700,arr=new Float32Array(count*3);
-    for(let i=0;i<count;i++){arr[i*3]=center.x+(Math.random()-.5)*size.x;arr[i*3+1]=box.min.y+Math.random()*size.y;arr[i*3+2]=center.z+(Math.random()-.5)*size.z}
-    dustGeo.setAttribute("position",new THREE.BufferAttribute(arr,3));
-    const dust=new THREE.Points(dustGeo,new THREE.PointsMaterial({color:0xd9c5a8,size:.035,transparent:true,opacity:.28,sizeAttenuation:true}));
-    scene.add(dust);
-
-    document.getElementById("objects").textContent=world.children.length+" ROOT";
-    document.getElementById("command").style.display="block";
-    document.getElementById("boot").style.display="none";
-    setState("WORLD ONLINE");
-    URL.revokeObjectURL(url);
-  },xhr=>{if(xhr.total)document.getElementById("bootmsg").textContent="LOADING "+Math.round(xhr.loaded/xhr.total*100)+"%"},err=>{
-    console.error(err);document.getElementById("bootmsg").textContent="LOAD ERROR — CHECK THE GLB FILE";setState("LOAD ERROR");
-  });
+(err)=>{
+console.error(err);
+document.getElementById("status").textContent=
+"ARCHIVE LOAD ERROR";
 }
+);
 
-document.getElementById("load").onclick=()=>document.getElementById("file").click();
-document.getElementById("file").onchange=e=>{if(e.target.files[0])loadWorld(e.target.files[0])};
+/* controls */
 
-document.addEventListener("keydown",e=>keys[e.code]=true);
-document.addEventListener("keyup",e=>keys[e.code]=false);
-document.body.addEventListener("click",()=>{if(world&&!document.getElementById("command").contains(document.activeElement))controls.lock()});
-controls.addEventListener("lock",()=>setState("EXPLORATION ACTIVE"));
-controls.addEventListener("unlock",()=>setState("WORLD PAUSED"));
+const controls=new PointerLockControls(camera,document.body);
+
+document.getElementById("start").addEventListener(
+"click",
+()=>controls.lock()
+);
+
+controls.addEventListener("lock",()=>{
+document.getElementById("start").style.display="none";
+});
+
+controls.addEventListener("unlock",()=>{
+document.getElementById("start").style.display="flex";
+});
+
+/* movement */
+
+const keys={};
+
+addEventListener("keydown",e=>{
+keys[e.code]=true;
+});
+
+addEventListener("keyup",e=>{
+keys[e.code]=false;
+});
+
+const clock=new THREE.Clock();
 
 function move(dt){
- if(!controls.isLocked||!world)return;
- const speed=(keys.ShiftLeft||keys.ShiftRight)?9:4.5,dir=new THREE.Vector3();
- if(keys.KeyW)dir.z-=1;if(keys.KeyS)dir.z+=1;if(keys.KeyA)dir.x-=1;if(keys.KeyD)dir.x+=1;
- if(!dir.lengthSq())return;dir.normalize();
- const forward=new THREE.Vector3();camera.getWorldDirection(forward);forward.y=0;forward.normalize();
- const right=new THREE.Vector3().crossVectors(forward,camera.up).normalize();
- camera.position.addScaledVector(forward,-dir.z*speed*dt);camera.position.addScaledVector(right,dir.x*speed*dt);
- downRay.set(new THREE.Vector3(camera.position.x,camera.position.y+20,camera.position.z),new THREE.Vector3(0,-1,0));
- const hits=downRay.intersectObjects(blockers,true);
- if(hits.length){const y=hits[0].point.y+1.7;if(y<camera.position.y+2.5)camera.position.y=THREE.MathUtils.lerp(camera.position.y,y,.28)}
+
+if(!controls.isLocked)return;
+
+let speed=keys.ShiftLeft||keys.ShiftRight?15:7;
+
+if(keys.KeyW)controls.moveForward(speed*dt);
+if(keys.KeyS)controls.moveForward(-speed*dt);
+if(keys.KeyA)controls.moveRight(-speed*dt);
+if(keys.KeyD)controls.moveRight(speed*dt);
+
+/* keep player above floor */
+
+if(camera.position.y<2.2)
+camera.position.y=2.2;
+
 }
 
-function command(text){
- const q=text.toLowerCase();let r="Command acknowledged.";
- if(q.includes("status"))r="AETHER // WORLD ONLINE // VISUAL SYSTEM NOMINAL.";
- else if(q.includes("center")||q.includes("home")){if(world){const b=new THREE.Box3().setFromObject(world),c=b.getCenter(new THREE.Vector3());camera.position.set(c.x,b.min.y+4,c.z+12);camera.lookAt(c)}r="Navigation vector reset."}
- else if(q.includes("fog")){scene.fog.density=.012;r="Atmospheric depth increased."}
- else if(q.includes("clear")){scene.fog.density=.003;r="Atmospheric depth reduced."}
- else if(q.includes("full screen")){document.documentElement.requestFullscreen?.();r="Fullscreen requested."}
- document.getElementById("reply").textContent="AETHER // "+r;
-}
-document.getElementById("exec").onclick=()=>{command(document.getElementById("cmd").value);document.getElementById("cmd").value=""};
-document.getElementById("cmd").addEventListener("keydown",e=>{if(e.key==="Enter")document.getElementById("exec").click()});
+/* dust */
 
-function animate(){
- requestAnimationFrame(animate);
- const now=performance.now(),dt=Math.min(.05,(now-last)/1000);last=now;
- frames++;if(now%1000<20){fps=Math.round(frames);frames=0}
- move(dt);if(mixer)mixer.update(dt);
- const p=camera.position;document.getElementById("pos").textContent=p.x.toFixed(1)+" / "+p.y.toFixed(1)+" / "+p.z.toFixed(1);
- document.getElementById("fps").textContent=fps||"--";
- composer.render();
+const dustGeo=new THREE.BufferGeometry();
+const dustCount=1800;
+const pos=new Float32Array(dustCount*3);
+
+for(let i=0;i<dustCount;i++){
+
+pos[i*3]=(Math.random()-.5)*150;
+pos[i*3+1]=Math.random()*70;
+pos[i*3+2]=(Math.random()-.5)*150;
+
 }
-animate();
+
+dustGeo.setAttribute(
+"position",
+new THREE.BufferAttribute(pos,3)
+);
+
+const dustMat=new THREE.PointsMaterial({
+color:0xb9c7d8,
+size:.035,
+transparent:true,
+opacity:.25,
+depthWrite:false
+});
+
+scene.add(new THREE.Points(dustGeo,dustMat));
+
+/* resize */
 
 addEventListener("resize",()=>{
- camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();
- renderer.setSize(innerWidth,innerHeight);composer.setSize(innerWidth,innerHeight);
+
+camera.aspect=innerWidth/innerHeight;
+camera.updateProjectionMatrix();
+
+renderer.setSize(innerWidth,innerHeight);
+composer.setSize(innerWidth,innerHeight);
+
 });
+
+/* loop */
+
+function animate(){
+
+requestAnimationFrame(animate);
+
+const dt=Math.min(clock.getDelta(),.05);
+
+move(dt);
+
+composer.render();
+
+}
+
+animate();
+
 </script>
 </body>
 </html>
